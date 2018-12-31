@@ -10,6 +10,13 @@ ext_modules = [
         extra_compile_args=['-fopenmp'],
         extra_link_args=['-fopenmp'],
         include_dirs=['./cython_sources/', './cpp_sources/'],
+    ),
+    Extension(
+        name="self_bleu",
+        sources=['./cython_sources/self_bleu_cy.pyx'],
+        extra_compile_args=['-fopenmp'],
+        extra_link_args=['-fopenmp'],
+        include_dirs=['./cython_sources/', './cpp_sources/'],
     )
 ]
 
