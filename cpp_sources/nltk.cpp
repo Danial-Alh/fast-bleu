@@ -37,6 +37,17 @@ void smooth_0(int size, Fraction *p_n)
         }
 }
 
+void smooth_1(int size, Fraction *p_n)
+{
+    Fraction epsilon = Fraction(1, 10);
+    for (int i = 0; i < size; i++)
+        if (p_n[i].numerator == 0)
+        {
+            p_n[i].numerator = epsilon.numerator;
+            p_n[i].denominator = p_n[i].denominator * epsilon.denominator;
+        }
+}
+
 Fraction modified_precision(map<string, int> **reference_max_counts,
                             vector<string> *hypothesis, int n)
 {
@@ -89,6 +100,7 @@ double corpus_bleu(int num_refs, int max_n,
     long long p_numerators[max_n] = {0};   // Key = ngram order, and value = no. of ngram matches.
     long long p_denominators[max_n] = {0}; // Key = ngram order, and value = no. of ngram in ref.
     int hyp_lengths = 0, ref_lengths = 0;
+    void (*smoothing_functions[])(int, Fraction *) = {&smooth_0, &smooth_1};
 
     for (int i = 0; i < max_n; i++)
     {
@@ -116,19 +128,19 @@ double corpus_bleu(int num_refs, int max_n,
     if (p_numerators[0] == 0)
         return 0;
 
-    if (smoothing_function != 0)
-        throw invalid_argument("smoothing 0 is only supported :)");
+    if (smoothing_function < 0 || smoothing_function > 1)
+        throw invalid_argument("smoothing 0 to 1 is only supported :)");
 
-    smooth_0(max_n, p_n);
+    smoothing_functions[smoothing_function](max_n, p_n);
     double s = 0.0;
     for (int i = 0; i < max_n; i++)
     {
-        if (p_n[i].numerator == 1 && p_n[i].denominator == numeric_limits<long long>::max())
+        if (smoothing_function == 0 && p_n[i].numerator == 1 && p_n[i].denominator == numeric_limits<long long>::max())
             s += ((double)weights[i]) * log(numeric_limits<long double>::min());
         else
             s += ((double)weights[i]) * log(((long double)p_n[i].numerator) / ((long double)p_n[i].denominator));
     }
-        
+
     // precise calculation???
 
     return bp * exp(s);

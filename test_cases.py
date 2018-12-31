@@ -1,4 +1,5 @@
 import numpy as np
+from nltk.translate.bleu_score import SmoothingFunction
 
 
 def counter_test():
@@ -15,7 +16,7 @@ def counter_test():
 
 
 def bleu_test():
-    weights = [1. / 3 for _ in range(3)]
+    weights = [1. / 4 for _ in range(4)]
 
     # def nltk_bleu(refs, hyps):
     #     from nltk.translate.bleu_score import sentence_bleu
@@ -24,13 +25,13 @@ def bleu_test():
 
     def nltk_bleu(refs, hyps):
         from old_metrics.bleu import Bleu
-        bleu = Bleu(refs, weights)
+        bleu = Bleu(refs, weights, smoothing_function=SmoothingFunction(epsilon=1./10).method1)
         return bleu.get_score(hyps)
         # return [1. for hyp in hyps]
 
     def cpp_bleu(refs, hyps):
-        from build.bleu_cy import BLEU
-        bleu = BLEU(refs, weights)
+        from lib.bleu import Bleu
+        bleu = Bleu(refs, weights, smoothing_function=1, other_instance=Bleu(refs, [0.5, 0.5]))
         return bleu.get_score(hyps)
 
     from nltk import word_tokenize
@@ -38,8 +39,8 @@ def bleu_test():
     test_tokens = []
     with open('data/coco60-train.txt') as file:
         lines = file.readlines()
-    train = lines[:20000]
-    test = lines[-20000:]
+    train = lines[:1000]
+    test = lines[-1000:]
     for line in train:
         train_tokens.append(word_tokenize(line))
     for line in test:
@@ -49,14 +50,14 @@ def bleu_test():
     import time
 
     start = time.time()
-    nltk_result = np.array(nltk_bleu(train_tokens, test_tokens))
-    end = time.time()
-    nltk_time = end - start
-
-    start = time.time()
     cpp_result = np.array(cpp_bleu(train_tokens, test_tokens))
     end = time.time()
     cpp_time = end - start
+
+    start = time.time()
+    nltk_result = np.array(nltk_bleu(train_tokens, test_tokens))
+    end = time.time()
+    nltk_time = end - start
 
     all_in_one = np.core.records.fromarrays([nltk_result, cpp_result, np.abs(nltk_result - cpp_result)],
                                             names='nltk,cpp,diff')

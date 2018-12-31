@@ -45,7 +45,7 @@ BLEU_CPP::~BLEU_CPP()
 }
 
 BLEU_CPP::BLEU_CPP(vector<vector<string>> lines_of_tokens, float weights[],
-                   int max_n, int smoothing_func, bool auto_reweight)
+                   int max_n, int smoothing_func, bool auto_reweight, BLEU_CPP *other_instance)
 {
     this->n_cores = thread::hardware_concurrency();
     this->references = new vector<string> *[lines_of_tokens.size()];
@@ -64,21 +64,41 @@ BLEU_CPP::BLEU_CPP(vector<vector<string>> lines_of_tokens, float weights[],
     this->smoothing_function = smoothing_func;
     this->number_of_refs = (int)lines_of_tokens.size();
 
+    cout << "bleu" << max_n << " init!" << endl;
+
     for (int i = 0; i < this->number_of_refs; i++)
     {
         this->references[i] = new vector<string>(lines_of_tokens[i]);
         this->ref_lens[i] = lines_of_tokens[i].size();
     }
     for (int n = 0; n < this->max_n; n++)
-        for (int i = 0; i < this->number_of_refs; i++)
-            this->references_ngrams[n][i] = get_ngrams(this->references[i], n + 1);
+    {
+        if (other_instance == NULL || n >= other_instance->max_n)
+            for (int i = 0; i < this->number_of_refs; i++)
+                this->references_ngrams[n][i] = get_ngrams(this->references[i], n + 1);
+        else
+            for (int i = 0; i < this->number_of_refs; i++)
+                this->references_ngrams[n][i] = new vector<string>(*(other_instance->references_ngrams[n][i]));
+    }
     for (int n = 0; n < this->max_n; n++)
-        for (int i = 0; i < this->number_of_refs; i++)
-            this->references_counts[n][i] = new Counter(this->references_ngrams[n][i]);
-    for (int i = 0; i < max_n; i++)
-        this->reference_max_counts[i] = new map<string, int>();
-    for (int n = 0; n < this->max_n; n++)
-        this->get_max_counts(n);
+    {
+        if (other_instance == NULL || n >= other_instance->max_n)
+            for (int i = 0; i < this->number_of_refs; i++)
+                this->references_counts[n][i] = new Counter(this->references_ngrams[n][i]);
+        else
+            for (int i = 0; i < this->number_of_refs; i++)
+                this->references_counts[n][i] = new Counter(other_instance->references_counts[n][i]);
+    }
+    for (int n = 0; n < max_n; n++)
+    {
+        if (other_instance == NULL || n >= other_instance->max_n)
+        {
+            this->reference_max_counts[n] = new map<string, int>();
+            this->get_max_counts(n);
+        }
+        else
+            this->reference_max_counts[n] = new map<string, int>(*(other_instance->reference_max_counts[n]));
+    }
 }
 
 void BLEU_CPP::get_max_counts(int n)
@@ -92,8 +112,8 @@ void BLEU_CPP::get_max_counts(int n)
 
     for (string &ng : ngram_keys)
         (*reference_max_counts[n])[ng] = 0;
-    
-#pragma omp parallel num_threads(n_cores)
+
+#pragma omp parallel
     {
 #pragma omp for schedule(guided)
         for (int i = 0; i < (int)ngram_keys.size(); i++)
@@ -113,8 +133,8 @@ void BLEU_CPP::get_score(vector<vector<string>> hypotheses, double *results)
 {
     if (results == NULL)
         throw invalid_argument("results ptr points to NULL!");
-
-#pragma omp parallel num_threads(n_cores)
+    cout << "calculating bleu" << max_n << " scores!" << endl;
+#pragma omp parallel
     {
 #pragma omp for schedule(nonmonotonic \
                          : guided)

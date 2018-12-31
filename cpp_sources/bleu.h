@@ -13,7 +13,7 @@ class BLEU_CPP
   public:
     ~BLEU_CPP();
     BLEU_CPP();
-    BLEU_CPP(vector<vector<string>>, float [], int, int, bool);
+    BLEU_CPP(vector<vector<string>>, float [], int, int, bool, BLEU_CPP*);
     void get_score(vector<vector<string>>, double*);
 
   private:

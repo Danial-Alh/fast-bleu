@@ -14,6 +14,14 @@ Counter::Counter(vector<string> *all_items)
     }
 }
 
+Counter::Counter(Counter *counter)
+{
+    for(Counter::iterator it = counter->begin(); it != counter->end(); ++it)
+    {
+        (*this)[it->first] = it->second;
+    }
+}
+
 int Counter::get(string item, int default_value)
 {
     Counter::iterator key_iterator = this->find(item);

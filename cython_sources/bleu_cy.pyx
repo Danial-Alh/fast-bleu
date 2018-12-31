@@ -3,14 +3,15 @@
 from libcpp.vector cimport vector
 from libcpp.string cimport string
 from libcpp cimport bool
-from bleu cimport BLEU_CPP
+from cython_sources.bleu_cpp cimport BLEU_CPP
 from cpython.mem cimport PyMem_Malloc, PyMem_Free
 
-cdef class BLEU:
+cdef class Bleu:
     cdef BLEU_CPP* bleu_instance
     cdef float* temp_weights
 
-    def __cinit__(self, list references, list weights, int smoothing_function=0, bool auto_reweigh=False):
+    def __cinit__(self, references, weights, int smoothing_function=0, bool auto_reweigh=False,
+                  Bleu other_instance=None):
         cdef vector[vector[string]] temp_refs = vector[vector[string]]()
         self.temp_weights = <float*> PyMem_Malloc(len(weights) * sizeof(float))
         for ref in references:
@@ -19,7 +20,11 @@ cdef class BLEU:
                 temp_refs.back().push_back(token.encode())
         for i, w in enumerate(weights):
             self.temp_weights[i] = w
-        self.bleu_instance = new BLEU_CPP(temp_refs, self.temp_weights, len(weights), smoothing_function, auto_reweigh)
+        cdef BLEU_CPP* other_cpp_instance = NULL
+        if other_instance is not None:
+            other_cpp_instance = other_instance.bleu_instance
+        self.bleu_instance = new BLEU_CPP(temp_refs, self.temp_weights, len(weights), smoothing_function, auto_reweigh,
+                                          other_cpp_instance)
 
     def __dealloc__(self):
         del self.bleu_instance

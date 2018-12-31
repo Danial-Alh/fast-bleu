@@ -32,7 +32,7 @@ Fraction::Fraction(long long n, long long d)
     else if (n == 0)
     {
         numerator = 0;
-        denominator = 1;
+        denominator = d;
     }
     else
     {

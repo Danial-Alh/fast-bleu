@@ -345,7 +345,7 @@ def brevity_penalty(closest_ref_len, hyp_len):
 
 class Bleu():  # this class speedup computation when reference is same for multisample
     # Base on https://www.nltk.org/_modules/nltk/translate/bleu_score.html
-    def __init__(self, references, weights=np.ones(3) / 3., smoothing_function=SmoothingFunction().method0,
+    def __init__(self, references, weights=np.ones(3) / 3., smoothing_function=SmoothingFunction().method1,
                  auto_reweigh=False, process_num=None, cached_fields=None):
         self.references = references
         self.weights = weights
