@@ -7,15 +7,15 @@ ext_modules = [
     Extension(
         name="bleu",
         sources=['./cython_sources/bleu_cy.pyx'],
-        extra_compile_args=['-fopenmp'],
-        extra_link_args=['-fopenmp'],
+        extra_compile_args=['-fopenmp', '-std=c++11'],
+        extra_link_args=['-fopenmp', '-std=c++11'],
         include_dirs=['./cython_sources/', './cpp_sources/'],
     ),
     Extension(
         name="self_bleu",
         sources=['./cython_sources/self_bleu_cy.pyx'],
-        extra_compile_args=['-fopenmp'],
-        extra_link_args=['-fopenmp'],
+        extra_compile_args=['-fopenmp', '-std=c++11'],
+        extra_link_args=['-fopenmp', '-std=c++11'],
         include_dirs=['./cython_sources/', './cpp_sources/'],
     )
 ]

@@ -12,7 +12,7 @@ from .utils import get_ngrams, Threader
 class SelfBleu():  # this class speedup computation when reference is same for multisample
     # Base on https://www.nltk.org/_modules/nltk/translate/bleu_score.html
     def __init__(self, references, weights=np.ones(3) / 3., smoothing_function=SmoothingFunction().method1,
-                 auto_reweigh=False, process_num=None, cached_fields=None):
+                 auto_reweigh=False, process_num=None, other_instance=None):
         self.references = references
         self.weights = weights
         self.smoothing_function = smoothing_function
@@ -24,7 +24,7 @@ class SelfBleu():  # this class speedup computation when reference is same for m
             self.process_num = process_num
 
         print('self-bleu{} init!'.format(self.max_n))
-        if cached_fields is None:
+        if other_instance is None:
             self.ref_lens = list(len(reference) for reference in references)
             self.references_ngrams = [get_ngrams(references, n + 1) for n in range(self.max_n)]
             self.references_counts = [[Counter(l) for l in self.references_ngrams[n]] for n in range(self.max_n)]
@@ -36,8 +36,8 @@ class SelfBleu():  # this class speedup computation when reference is same for m
             references_ngrams, \
             references_counts, \
             reference_max_counts, \
-            reference_max2_counts = cached_fields
-            self.ref_lens = ref_lens[:self.max_n]
+            reference_max2_counts = other_instance.get_cached_fields()
+            self.ref_lens = ref_lens
             self.references_ngrams = references_ngrams[:self.max_n]
             self.references_counts = references_counts[:self.max_n]
             self.reference_max_counts = reference_max_counts[:self.max_n]

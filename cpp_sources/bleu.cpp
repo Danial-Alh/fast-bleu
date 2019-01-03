@@ -5,7 +5,6 @@
 #include <stdexcept>
 #include <limits>
 #include "bleu.h"
-#include "tqdm/tqdm.h"
 #include "counter.cpp"
 #include "nltk.cpp"
 
@@ -136,8 +135,7 @@ void BLEU_CPP::get_score(vector<vector<string>> hypotheses, double *results)
     cout << "calculating bleu" << max_n << " scores!" << endl;
 #pragma omp parallel
     {
-#pragma omp for schedule(nonmonotonic \
-                         : guided)
+#pragma omp for schedule(guided)
         for (int i = 0; i < (int)hypotheses.size(); i++)
         {
             vector<string> *hypothesis = &(hypotheses[i]);

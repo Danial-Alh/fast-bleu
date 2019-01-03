@@ -10,7 +10,7 @@ cdef class Bleu:
     cdef BLEU_CPP* bleu_instance
     cdef float* temp_weights
 
-    def __cinit__(self, references, weights, int smoothing_function=0, bool auto_reweigh=False,
+    def __cinit__(self, references, weights, int smoothing_function=1, bool auto_reweigh=False,
                   Bleu other_instance=None):
         cdef vector[vector[string]] temp_refs = vector[vector[string]]()
         self.temp_weights = <float*> PyMem_Malloc(len(weights) * sizeof(float))

@@ -11,7 +11,7 @@ cdef class SelfBleu:
     cdef int num_refs
     cdef float* temp_weights
 
-    def __cinit__(self, references, weights, int smoothing_function=0, bool auto_reweigh=False,
+    def __cinit__(self, references, weights, int smoothing_function=1, bool auto_reweigh=False,
                   SelfBleu other_instance=None):
         self.num_refs = len(references)
         cdef vector[vector[string]] temp_refs = vector[vector[string]]()
