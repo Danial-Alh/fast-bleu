@@ -9,14 +9,14 @@ ext_modules = [
         sources=['./cython_sources/bleu_cy.pyx'],
         extra_compile_args=['-fopenmp', '-std=c++11'],
         extra_link_args=['-fopenmp', '-std=c++11'],
-        include_dirs=['./cython_sources/', './cpp_sources/'],
+        include_dirs=['./cpp_sources/headers/', './cpp_sources/sources/'],
     ),
     Extension(
         name="self_bleu",
         sources=['./cython_sources/self_bleu_cy.pyx'],
         extra_compile_args=['-fopenmp', '-std=c++11'],
         extra_link_args=['-fopenmp', '-std=c++11'],
-        include_dirs=['./cython_sources/', './cpp_sources/'],
+        include_dirs=['./cpp_sources/headers/', './cpp_sources/sources/'],
     )
 ]
 

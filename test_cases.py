@@ -14,7 +14,8 @@ def counter_test():
     print(counter['123'])
 
 
-weights = np.ones(4) / 4.
+n = 2
+weights = np.ones(n) / float(n)
 
 
 def nltk_org_bleu(refs, hyps):
@@ -41,16 +42,25 @@ def cpp_bleu(refs, hyps):
 
 def nltk_self_bleu(refs, hyps):
     from old_metrics.self_bleu import SelfBleu
-    bleu = SelfBleu(refs, weights, smoothing_function=SmoothingFunction(epsilon=1. / 10).method1)
-    return bleu.get_score()
+    b5 = SelfBleu(hyps, np.ones(5) / 5.)
+    bleu = SelfBleu(hyps, weights, smoothing_function=SmoothingFunction(epsilon=1. / 10).method1,
+                    other_instance=b5)
+    res = bleu.get_score()
+    del b5
+    del bleu
+    return res
     # return [1. for hyp in hyps]
 
 
 def cpp_self_bleu(refs, hyps):
     from lib.self_bleu import SelfBleu
-    bleu = SelfBleu(refs, weights, smoothing_function=1)
-    # bleu = SelfBleu(refs, weights, smoothing_function=1, other_instance=None)
-    return bleu.get_score()
+    b5 = SelfBleu(hyps, np.ones(5) / 5.)
+    bleu = SelfBleu(hyps, weights, smoothing_function=1,
+                    other_instance=b5)
+    res = bleu.get_score()
+    del bleu
+    del b5
+    return res
 
 
 def compare(nltk_func, cpp_func):
@@ -89,7 +99,8 @@ for line in lines:
 
 print('tokenized!')
 
-compare(nltk_org_bleu, nltk_bleu)
+# compare(nltk_org_bleu, cpp_bleu)
+compare(nltk_self_bleu, cpp_self_bleu)
 
 # counter_test()
 
