@@ -5,8 +5,8 @@
 #include <stdexcept>
 #include <limits>
 #include "bleu.h"
-#include "counter.cpp"
-#include "nltk.cpp"
+#include "counter.h"
+#include "nltk.h"
 
 using namespace std;
 
@@ -43,8 +43,8 @@ BLEU_CPP::~BLEU_CPP()
     delete[] this->reference_max_counts;
 }
 
-BLEU_CPP::BLEU_CPP(vector<vector<string>> lines_of_tokens, float weights[],
-                   int max_n, int smoothing_func, bool auto_reweight, BLEU_CPP *other_instance)
+BLEU_CPP::BLEU_CPP(vector<vector<string>> lines_of_tokens, vector<vector<float>> weights,
+                   int max_n, int smoothing_func, bool auto_reweight)
 {
     this->n_cores = thread::hardware_concurrency();
     this->references = new vector<string> *[lines_of_tokens.size()];
@@ -72,36 +72,18 @@ BLEU_CPP::BLEU_CPP(vector<vector<string>> lines_of_tokens, float weights[],
     }
     for (int n = 0; n < this->max_n; n++)
     {
-        if (other_instance == NULL || n >= other_instance->max_n)
-            for (int i = 0; i < this->number_of_refs; i++)
-                this->references_ngrams[n][i] = get_ngrams(this->references[i], n + 1);
-        else
-            for (int i = 0; i < this->number_of_refs; i++)
-                this->references_ngrams[n][i] = new vector<string>(*(other_instance->references_ngrams[n][i]));
-    }
-    for (int n = 0; n < this->max_n; n++)
-    {
-        if (other_instance == NULL || n >= other_instance->max_n)
-            for (int i = 0; i < this->number_of_refs; i++)
-                this->references_counts[n][i] = new Counter(this->references_ngrams[n][i]);
-        else
-            for (int i = 0; i < this->number_of_refs; i++)
-                this->references_counts[n][i] = new Counter(*other_instance->references_counts[n][i]);
-    }
-    for (int n = 0; n < max_n; n++)
-    {
-        if (other_instance == NULL || n >= other_instance->max_n)
+        for (int i = 0; i < this->number_of_refs; i++)
         {
-            this->reference_max_counts[n] = new CustomMap();
-            this->get_max_counts(n);
+            this->references_ngrams[n][i] = get_ngrams(this->references[i], n + 1);
+            this->references_counts[n][i] = new Counter(this->references_ngrams[n][i]);
         }
-        else
-            this->reference_max_counts[n] = new CustomMap(*(other_instance->reference_max_counts[n]));
+        this->get_max_counts(n);
     }
 }
 
 void BLEU_CPP::get_max_counts(int n)
 {
+    this->reference_max_counts[n] = new CustomMap();
     vector<string> ngram_keys = vector<string>();
     for (int i = 0; i < this->number_of_refs; i++)
         for (string &ng : *this->references_ngrams[n][i])
@@ -127,25 +109,33 @@ void BLEU_CPP::get_max_counts(int n)
         (*reference_max_counts[n])[ngram_keys[i]] = temp_max_counts[i];
 }
 
-void BLEU_CPP::get_score(vector<vector<string>> hypotheses, double *results)
+vector<vector<double>> BLEU_CPP::get_score(vector<vector<string>> hypotheses)
 {
-    if (results == NULL)
-        throw invalid_argument("results ptr points to NULL!");
-    cout << "calculating bleu" << max_n << " scores!" << endl;
-#pragma omp parallel
+    vector<vector<double>> results;
+    for (vector<float> &w: this->weights)
     {
-#pragma omp for schedule(guided)
-        for (int i = 0; i < (int)hypotheses.size(); i++)
+        double temp_results[hypotheses.size()];
+        int curr_n = w.size();
+//        cout << "calculating bleu" << curr_n << " scores!" << endl;
+        #pragma omp parallel
         {
-            vector<string> *hypothesis = &(hypotheses[i]);
-            results[i] = corpus_bleu(number_of_refs, max_n,
-                                     references,
-                                     hypothesis,
-                                     reference_max_counts,
-                                     ref_lens,
-                                     weights,
-                                     smoothing_function,
-                                     auto_reweigh);
+            #pragma omp for schedule(guided)
+            for (int i = 0; i < (int)hypotheses.size(); i++)
+            {
+                vector<string> *hypothesis = &(hypotheses[i]);
+                temp_results[i] = corpus_bleu(number_of_refs, curr_n,
+                                        references,
+                                        hypothesis,
+                                        reference_max_counts,
+                                        ref_lens,
+                                        w,
+                                        smoothing_function,
+                                        auto_reweigh);
+            }
         }
+        results.push_back(vector<double>());
+        for (int i = 0; i < (int)hypotheses.size(); i++)
+            results.back().push_back(temp_results[i]);
     }
+    return results;
 }

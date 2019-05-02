@@ -13,8 +13,8 @@ class SELF_BLEU_CPP
 public:
   ~SELF_BLEU_CPP();
   SELF_BLEU_CPP();
-  SELF_BLEU_CPP(vector<vector<string>>, float[], int, int, bool, SELF_BLEU_CPP *);
-  void get_score(double *);
+  SELF_BLEU_CPP(vector<vector<string>>, vector<vector<float>>, int, int, bool);
+  vector<vector<double>> get_score();
 
 private:
   vector<string> **references;
@@ -22,7 +22,7 @@ private:
   Counter ***references_counts;
   CustomMap **reference_max_counts;
   CustomMap **reference_max2_counts;
-  float *weights;
+  vector<vector<float>> weights;
   int smoothing_function;
   bool auto_reweigh;
   int max_n;

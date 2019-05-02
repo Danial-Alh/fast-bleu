@@ -1,27 +1,28 @@
-from distutils.core import setup
-from distutils.extension import Extension
+from glob import glob
 
-from Cython.Build import cythonize
+import setuptools
+from setuptools.command.build_ext import build_ext
+from setuptools.extension import Extension
 
-ext_modules = [
-    Extension(
-        name="bleu",
-        sources=['./cython_sources/bleu_cy.pyx'],
-        extra_compile_args=['-fopenmp', '-std=c++11'],
-        extra_link_args=['-fopenmp', '-std=c++11'],
-        include_dirs=['./cpp_sources/headers/', './cpp_sources/sources/'],
-    ),
-    Extension(
-        name="self_bleu",
-        sources=['./cython_sources/self_bleu_cy.pyx'],
-        extra_compile_args=['-fopenmp', '-std=c++11'],
-        extra_link_args=['-fopenmp', '-std=c++11'],
-        include_dirs=['./cpp_sources/headers/', './cpp_sources/sources/'],
-    )
-]
 
-setup(
-    name='cy_bleu_setup',
-    ext_modules=cythonize(ext_modules, build_dir='./build'),
-    requires=['Cython']
+class BuildExtWithoutPlatformSuffix(build_ext):
+    def get_ext_filename(self, ext_name):
+        super().get_ext_filename(ext_name)
+        return ext_name + '.so'
+    # pass
+
+
+include_dirs = ['fast_bleu/cpp_sources/headers/']
+setup = setuptools.setup(
+    name='fast_bleu',
+    ext_modules=[
+        Extension(
+            name="fast_bleu.__fast_bleu_module",
+            sources=glob('fast_bleu/cpp_sources/sources/*.cpp'),
+            extra_compile_args=['-fopenmp', '-std=c++11'],
+            extra_link_args=['-fopenmp', '-std=c++11'],
+            include_dirs=include_dirs,
+        ), ],
+    cmdclass={'build_ext': BuildExtWithoutPlatformSuffix},
+    packages=['fast_bleu'],
 )

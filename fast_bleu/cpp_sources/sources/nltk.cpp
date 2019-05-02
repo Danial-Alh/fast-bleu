@@ -7,8 +7,8 @@
 #include <tuple>
 #include "custmap.h"
 #include "counter.h"
-#include "fraction.cpp"
-#include "custmap.cpp"
+#include "fraction.h"
+#include "custmap.h"
 
 
 using namespace std;
@@ -95,7 +95,7 @@ double corpus_bleu(int num_refs, int max_n,
                    vector<string> *hypothesis,
                    CustomMap **reference_max_counts,
                    int *ref_lens,
-                   float *weights,
+                   vector<float> weights,
                    int smoothing_function,
                    bool auto_reweigh)
 {
@@ -119,7 +119,7 @@ double corpus_bleu(int num_refs, int max_n,
 
     float temp_weights[4] = {0.25};
     if (auto_reweigh)
-        if (hyp_lengths < 4 && equal(weights, weights + max_n, temp_weights))
+        if (hyp_lengths < 4 && equal(weights.begin(), weights.end(), temp_weights))
             for (int i = 0; i < max_n; i++)
                 weights[i] = 1. / hyp_lengths;
 

@@ -1,0 +1,3 @@
+recursive-include ./fast_bleu *.py
+recursive-include ./fast_bleu *.h
+recursive-include ./fast_bleu *.cpp

@@ -1,66 +1,48 @@
 import numpy as np
 from nltk.translate.bleu_score import SmoothingFunction
+from fast_bleu import *
 
-
-def counter_test():
-    from build.counter_cy import Counter
-
-    counter = Counter(['ali2'])
-    counter['hello'] = 2
-    print(counter['hello'])
-    print(counter['ali2'])
-    print(counter['ali3'])
-    # print(counter.get('123', -4))
-    print(counter['123'])
-
-
-n = 2
-weights = np.ones(n) / float(n)
+# min_n = 2
+max_n = 5
+weights = np.ones(max_n) / float(max_n)
 
 
 def nltk_org_bleu(refs, hyps):
     from nltk.translate.bleu_score import sentence_bleu
     return [sentence_bleu(refs, hyp, weights=weights, smoothing_function=SmoothingFunction(epsilon=1. / 10).method1)
             for hyp in hyps]
-    # return [1. for hyp in hyps]
 
 
 def nltk_bleu(refs, hyps):
     from old_metrics.bleu import Bleu
-    bleu = Bleu(refs, weights, smoothing_function=SmoothingFunction(epsilon=1. / 10).method1,
-                other_instance=Bleu(refs, np.ones(5) / 5.))
+    bleu = Bleu(refs, weights, smoothing_function=SmoothingFunction(epsilon=1. / 10).method1)
     return bleu.get_score(hyps)
     # return [1. for hyp in hyps]
 
 
 def cpp_bleu(refs, hyps):
-    from lib.bleu import Bleu
-    bleu = Bleu(refs, weights, smoothing_function=1,
-                other_instance=Bleu(refs, np.ones(5) / 5.))
-    return bleu.get_score(hyps)
+    print(Bleu)
+    w = {i: list(np.ones(i) / (i)) for i in range(2, 6)}
+    bleu = Bleu(refs, w)
+    return bleu.get_score(hyps)[max_n]
 
 
 def nltk_self_bleu(refs, hyps):
     from old_metrics.self_bleu import SelfBleu
-    b5 = SelfBleu(hyps, np.ones(5) / 5.)
-    bleu = SelfBleu(hyps, weights, smoothing_function=SmoothingFunction(epsilon=1. / 10).method1,
-                    other_instance=b5)
+    bleu = SelfBleu(hyps, weights, smoothing_function=SmoothingFunction(epsilon=1. / 10).method1)
     res = bleu.get_score()
-    del b5
     del bleu
     return res
     # return [1. for hyp in hyps]
 
 
 def cpp_self_bleu(refs, hyps):
-    from lib.self_bleu import SelfBleu
-    b5 = SelfBleu(hyps, np.ones(5) / 5.)
-    bleu = SelfBleu(hyps, weights, smoothing_function=1,
-                    other_instance=b5)
+    from fast_bleu.__python_wrapper import SelfBleu
+    w = {i: list(np.ones(i) / (i)) for i in range(2, 6)}
+    bleu = SelfBleu(refs, w)
     res = bleu.get_score()
     del bleu
-    del b5
-    return res
+    return res[max_n]
 
 
 def compare(nltk_func, cpp_func):
@@ -77,12 +59,14 @@ def compare(nltk_func, cpp_func):
 
     all_in_one = np.core.records.fromarrays([nltk_result, cpp_result, np.abs(nltk_result - cpp_result)],
                                             names='nltk,cpp,diff')
-    print(all_in_one)
+    # print(all_in_one)
     print('sum diff ' + str(np.sum(all_in_one.diff)))
     print('nltk: {}, cpp: {}, cpp speedup: {}'.format(nltk_time, cpp_time, float(nltk_time) / cpp_time))
 
 
-from nltk import word_tokenize
+from nltk import ToktokTokenizer
+
+tokenizer = ToktokTokenizer().tokenize
 
 ref_tokens = []
 test_tokens = []
@@ -90,17 +74,48 @@ test_tokens = []
 with open('data/t.txt') as file:
     lines = file.readlines()
 for line in lines:
-    ref_tokens.append(word_tokenize(line))
+    ref_tokens.append(tokenizer(line))
 
 with open('data/g.txt') as file:
     lines = file.readlines()
 for line in lines:
-    test_tokens.append(word_tokenize(line))
+    test_tokens.append(tokenizer(line))
 
 print('tokenized!')
 
-# compare(nltk_org_bleu, cpp_bleu)
-compare(nltk_self_bleu, cpp_self_bleu)
+from glob import glob
+
+import setuptools
+from setuptools.command.build_ext import build_ext
+from setuptools.extension import Extension
+
+
+class BuildExtWithoutPlatformSuffix(build_ext):
+    def get_ext_filename(self, ext_name):
+        super().get_ext_filename(ext_name)
+        return ext_name + '.so'
+    # pass
+
+
+include_dirs = ['fast_bleu/cpp_sources/headers/']
+setup = setuptools.setup(
+    name='fast_bleu',
+    ext_modules=[
+        Extension(
+            name="fast_bleu.fast_bleu_module",
+            sources=glob('fast_bleu/cpp_sources/sources/*.cpp'),
+            extra_compile_args=['-fopenmp', '-std=c++11'],
+            extra_link_args=['-fopenmp', '-std=c++11'],
+            include_dirs=include_dirs,
+        ), ],
+    packages=['fast_bleu'],
+    cmdclass={'build_ext': BuildExtWithoutPlatformSuffix},
+    script_args=['build_ext', '--build-lib', './']
+)
+
+compare(nltk_org_bleu, cpp_bleu)
+# compare(nltk_bleu, cpp_bleu)
+# compare(nltk_self_bleu, cpp_self_bleu)
 
 # counter_test()
 

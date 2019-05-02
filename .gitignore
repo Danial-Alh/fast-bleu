@@ -1,5 +1,9 @@
 build/
-.idea
-.vscode
+.idea/
+.vscode/
 *.pyc
 *.so
+dist/
+*.egg-info
+*.zip
+temp/

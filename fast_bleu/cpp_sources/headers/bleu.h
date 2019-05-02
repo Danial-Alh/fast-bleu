@@ -13,15 +13,15 @@ class BLEU_CPP
 public:
   ~BLEU_CPP();
   BLEU_CPP();
-  BLEU_CPP(vector<vector<string>>, float[], int, int, bool, BLEU_CPP *);
-  void get_score(vector<vector<string>>, double *);
+  BLEU_CPP(vector<vector<string>>, vector<vector<float>>, int, int, bool);
+  vector<vector<double>> get_score(vector<vector<string>>);
 
 private:
   vector<string> **references;
   vector<string> ***references_ngrams;
   Counter ***references_counts;
   CustomMap **reference_max_counts;
-  float *weights;
+  vector<vector<float>> weights;
   int smoothing_function;
   bool auto_reweigh;
   int max_n;
