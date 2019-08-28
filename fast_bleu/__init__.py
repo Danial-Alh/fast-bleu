@@ -1,3 +1,3 @@
-from .__python_wrapper import Bleu, SelfBleu
+from .__python_wrapper import BLEU, SelfBLEU
 
-__all__ = ['Bleu', 'SelfBleu']
+__all__ = ['BLEU', 'SelfBLEU']

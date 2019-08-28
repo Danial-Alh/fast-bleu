@@ -9,12 +9,21 @@ class BuildExtWithoutPlatformSuffix(build_ext):
     def get_ext_filename(self, ext_name):
         super().get_ext_filename(ext_name)
         return ext_name + '.so'
-    # pass
 
+
+with open("README.md", "r") as fh:
+    long_description = fh.read()
 
 include_dirs = ['fast_bleu/cpp_sources/headers/']
 setup = setuptools.setup(
-    name='fast_bleu',
+    name='FastBLEU',
+    version="0.0.2",
+    author="Danial Alihosseini",
+    author_email="danial.alihosseini@gmail.com",
+    description="a fast multithreaded C++ implementation of nltk BLEU.",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    url="https://github.com/Danial-Alh/FastBLEU",
     ext_modules=[
         Extension(
             name="fast_bleu.__fast_bleu_module",
@@ -25,4 +34,14 @@ setup = setuptools.setup(
         ), ],
     cmdclass={'build_ext': BuildExtWithoutPlatformSuffix},
     packages=['fast_bleu'],
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: POSIX :: Linux",
+        "Development Status :: 3 - Alpha",
+    ],
+    python_requires='>=3',
+    install_requires=[],
+    platforms=['POSIX :: Linux'],
+    license='OSI Approved :: MIT License'
 )
