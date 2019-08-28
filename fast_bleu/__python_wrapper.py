@@ -14,7 +14,7 @@ def _load_cdll():
 class BLEU:
     """
     A class to compute BLEU score for a fixed reference set.
-    It can return BLEU for different n-grams simultanously and efficiently (e.g. BLEU-2, BLEU-3 and etc.).
+    It can return BLEU for different (max) n-grams simultanously and efficiently (e.g. BLEU-2, BLEU-3 and etc.).
 
     Here is an example to compute BLEU-2 and BLEU-3:
     >>> ref1 = ['It', 'is', 'a', 'guide', 'to', 'action', 'that',
@@ -54,7 +54,7 @@ class BLEU:
     lines_of_tokens : list
         Reference set.
         List of list of tokens (list of references; each reference is a list of token).
-        **Caution** Each token is converted to string format during calculation.
+        **Caution** Each token is converted to string format during computation.
     weights : dict, optional
         weights for unigrams, bigrams, trigrams and so on for each BLEU-N.
         A key must be provided for each BLEU-N weights; the BLEU-N will be indentified with this key.
@@ -100,7 +100,7 @@ class BLEU:
         hypotheses : list
             Hypothesis set.
             List of list of tokens (list of hypotheses; each hypothesis is a list of token).
-            **Caution** Each token is converted to string format during calculation.
+            **Caution** Each token is converted to string format during computation.
         
         Returns
         -------
@@ -120,7 +120,7 @@ class BLEU:
 class SelfBLEU:
     """
     A class to compute SelfBLEU score for a fixed reference set.
-    It can return SelfBLEU for different n-grams simultanously and efficiently (e.g. SelfBLEU-2, SelfBLEU-3 and etc.).
+    It can return SelfBLEU for different (max) n-grams simultanously and efficiently (e.g. SelfBLEU-2, SelfBLEU-3 and etc.).
 
     Here is an example to compute SelfBLEU-2 and SelfBLEU-3:
     >>> ref1 = ['It', 'is', 'a', 'guide', 'to', 'action', 'that',
@@ -163,7 +163,7 @@ class SelfBLEU:
     lines_of_tokens : list
         Reference set.
         List of list of tokens (list of references; each reference is a list of token).
-        **Caution** Each token is converted to string format during calculation.
+        **Caution** Each token is converted to string format during computation.
     weights : dict, optional
         weights for unigrams, bigrams, trigrams and so on for each SelfBLEU-N.
         A key must be provided for each SelfBLEU-N weights; the SelfBLEU-N will be indentified with this key.
