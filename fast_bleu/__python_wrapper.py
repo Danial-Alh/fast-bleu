@@ -14,7 +14,7 @@ def _load_cdll():
 class BLEU:
     """
     A class to compute BLEU score for a fixed reference set.
-    It can return BLEU for different (max) n-grams simultanously and efficiently (e.g. BLEU-2, BLEU-3 and etc.).
+    It can return BLEU for different (max) n-grams simultaneously and efficiently (e.g. BLEU-2, BLEU-3 and etc.).
 
     Here is an example to compute BLEU-2 and BLEU-3:
     >>> ref1 = ['It', 'is', 'a', 'guide', 'to', 'action', 'that',
@@ -120,7 +120,7 @@ class BLEU:
 class SelfBLEU:
     """
     A class to compute SelfBLEU score for a fixed reference set.
-    It can return SelfBLEU for different (max) n-grams simultanously and efficiently (e.g. SelfBLEU-2, SelfBLEU-3 and etc.).
+    It can return SelfBLEU for different (max) n-grams simultaneously and efficiently (e.g. SelfBLEU-2, SelfBLEU-3 and etc.).
 
     Here is an example to compute SelfBLEU-2 and SelfBLEU-3:
     >>> ref1 = ['It', 'is', 'a', 'guide', 'to', 'action', 'that',
@@ -155,7 +155,7 @@ class SelfBLEU:
 
         SelfBLEU-3 for ref1 is 0.07808966062765045
         SelfBLEU-3 for ref2 is 0.20140620205719248
-        SelfBLEU-2 for ref3 is 0.21415334758254043
+        SelfBLEU-3 for ref3 is 0.21415334758254043
 
         
     Parameters
