@@ -6,7 +6,7 @@ It can return (Self)BLEU for different (max) n-grams simultaneously and efficien
 ## Sample Usage
 Here is an example to compute BLEU-2, BLEU-3, SelfBLEU-2 and SelfBLEU-3:
 
-```
+```python
 >>> from fast_bleu import BLEU, SelfBLEU
 >>> ref1 = ['It', 'is', 'a', 'guide', 'to', 'action', 'that',
 ...          'ensures', 'that', 'the', 'military', 'will', 'forever',
@@ -40,7 +40,7 @@ which means:
 * BLEU-3 for hyp1 is 0.6240726901657495
 * BLEU-3 for hyp2 is 0.013720869575946234
 
-```
+```python
 >>> self_bleu = SelfBLEU(list_of_references, weights)
 >>> self_bleu.get_score()
 {'bigram': [0.25819888974716115, 0.3615507630310936, 0.37080992435478316],
