@@ -3,6 +3,13 @@
 This is a fast multithreaded C++ implementation of NLTK BLEU; computing BLEU and SelfBLEU score for a fixed reference set.
 It can return (Self)BLEU for different (max) n-grams simultaneously and efficiently (e.g. BLEU-2, BLEU-3 and etc.).
 
+## Installation
+Latest PyPI stable release
+
+~~~~~~~~~~~~~~~~~~~~~~~~
+pip install --user PrettyConfig
+~~~~~~~~~~~~~~~~~~~~~~~~
+
 ## Sample Usage
 Here is an example to compute BLEU-2, BLEU-3, SelfBLEU-2 and SelfBLEU-3:
 
@@ -57,3 +64,5 @@ which means:
 * SelfBLEU-3 for ref3 is 0.21415334758254043
 
 **Caution** Each token of reference set is converted to string format during computation.
+
+For further details, refer to the documentation provided in source codes.
