@@ -4,10 +4,10 @@ This is a fast multithreaded C++ implementation of NLTK BLEU; computing BLEU and
 It can return (Self)BLEU for different (max) n-grams simultaneously and efficiently (e.g. BLEU-2, BLEU-3 and etc.).
 
 ## Installation
-Latest PyPI stable release
+PyPI latest stable release
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-pip install --user PrettyConfig
+pip install --user FastBLEU
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## Sample Usage
@@ -65,4 +65,21 @@ which means:
 
 **Caution** Each token of reference set is converted to string format during computation.
 
-For further details, refer to the documentation provided in source codes.
+For further details, refer to the documentation provided in the source codes.
+
+# Citation
+
+Please cite our paper if it helps with your research.
+
+* ACL Anthology: https://www.aclweb.org/anthology/W19-2311
+* Arxiv link: https://arxiv.org/abs/1904.03971
+
+```latex
+@article{https://arxiv.org/abs/1904.03971,
+  title={Jointly Measuring Diversity and Quality in Text Generation Models},
+  author={Montahaei, Ehsan and Alihosseini, Danial and Baghshah, Mahdieh Soleymani},
+  journal={NAACL HLT 2019},
+  pages={90},
+  year={2019}
+}
+```
