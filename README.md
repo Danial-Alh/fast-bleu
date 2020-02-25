@@ -76,18 +76,18 @@ Please cite our paper if it helps with your research.
 
 ```latex
 @inproceedings{alihosseini-etal-2019-jointly,
-    title = "Jointly Measuring Diversity and Quality in Text Generation Models",
-    author = "Alihosseini, Danial  and
+    title = {Jointly Measuring Diversity and Quality in Text Generation Models},
+    author = {Alihosseini, Danial  and
       Montahaei, Ehsan  and
-      Soleymani Baghshah, Mahdieh",
-    booktitle = "Proceedings of the Workshop on Methods for Optimizing and Evaluating Neural Language Generation",
-    month = jun,
-    year = "2019",
-    address = "Minneapolis, Minnesota",
-    publisher = "Association for Computational Linguistics",
-    url = "https://www.aclweb.org/anthology/W19-2311",
-    doi = "10.18653/v1/W19-2311",
-    pages = "90--98",
+      Soleymani Baghshah, Mahdieh},
+    booktitle = {Proceedings of the Workshop on Methods for Optimizing and Evaluating Neural Language Generation},
+    month = {jun},
+    year = {2019},
+    address = {Minneapolis, Minnesota},
+    publisher = {Association for Computational Linguistics},
+    url = {https://www.aclweb.org/anthology/W19-2311},
+    doi = {10.18653/v1/W19-2311},
+    pages = {90--98},
 }
 
 ```
