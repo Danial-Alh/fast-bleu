@@ -75,11 +75,19 @@ Please cite our paper if it helps with your research.
 * Arxiv link: https://arxiv.org/abs/1904.03971
 
 ```latex
-@article{https://arxiv.org/abs/1904.03971,
-  title={Jointly Measuring Diversity and Quality in Text Generation Models},
-  author={Montahaei, Ehsan and Alihosseini, Danial and Baghshah, Mahdieh Soleymani},
-  journal={NAACL HLT 2019},
-  pages={90},
-  year={2019}
+@inproceedings{alihosseini-etal-2019-jointly,
+    title = "Jointly Measuring Diversity and Quality in Text Generation Models",
+    author = "Alihosseini, Danial  and
+      Montahaei, Ehsan  and
+      Soleymani Baghshah, Mahdieh",
+    booktitle = "Proceedings of the Workshop on Methods for Optimizing and Evaluating Neural Language Generation",
+    month = jun,
+    year = "2019",
+    address = "Minneapolis, Minnesota",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/W19-2311",
+    doi = "10.18653/v1/W19-2311",
+    pages = "90--98",
 }
+
 ```
