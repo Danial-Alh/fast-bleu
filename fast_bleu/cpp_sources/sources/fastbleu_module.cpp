@@ -90,10 +90,10 @@ PyObject* vectorofvector2listoflist_double(const vector<vector<double>> &data)
 
 
 extern "C" void* get_bleu_instance(PyObject* lines_of_tokens, PyObject* weights,
-                                int max_n, int smoothing_func, bool auto_reweight)
+                                int max_n, int smoothing_func, bool auto_reweight, bool verbose)
 {
     void* ptr;
-    ptr = (void *) new BLEU_CPP(listoflist2vectorofvector_str(lines_of_tokens), listoflist2vectorofvector_float(weights), max_n, smoothing_func,  auto_reweight);
+    ptr = (void *) new BLEU_CPP(listoflist2vectorofvector_str(lines_of_tokens), listoflist2vectorofvector_float(weights), max_n, smoothing_func,  auto_reweight, verbose);
     return ptr;
 }
 
@@ -111,10 +111,10 @@ extern "C" void* del_bleu_instance(void* bleu_ptr)
 }
 
 extern "C" void* get_selfbleu_instance(PyObject* lines_of_tokens, PyObject* weights,
-                                int max_n, int smoothing_func, bool auto_reweight)
+                                int max_n, int smoothing_func, bool auto_reweight, bool verbose)
 {
     void* ptr;
-    ptr = (void *) new SELF_BLEU_CPP(listoflist2vectorofvector_str(lines_of_tokens), listoflist2vectorofvector_float(weights), max_n, smoothing_func,  auto_reweight);
+    ptr = (void *) new SELF_BLEU_CPP(listoflist2vectorofvector_str(lines_of_tokens), listoflist2vectorofvector_float(weights), max_n, smoothing_func,  auto_reweight, verbose);
     return ptr;
 }
 

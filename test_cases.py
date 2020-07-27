@@ -1,3 +1,8 @@
+from setuptools.extension import Extension
+from setuptools.command.build_ext import build_ext
+import setuptools
+from glob import glob
+from nltk import ToktokTokenizer
 import numpy as np
 from nltk.translate.bleu_score import SmoothingFunction
 from fast_bleu import *
@@ -21,15 +26,15 @@ def nltk_bleu(refs, hyps):
 
 
 def cpp_bleu(refs, hyps):
-    print(Bleu)
+    print(BLEU)
     w = {i: list(np.ones(i) / (i)) for i in range(2, 6)}
-    bleu = Bleu(refs, w)
+    bleu = BLEU(refs, w, verbose=False)
     return bleu.get_score(hyps)[max_n]
 
 
 def nltk_self_bleu(refs, hyps):
     from old_metrics.self_bleu import SelfBleu
-    bleu = SelfBleu(hyps, weights, smoothing_function=SmoothingFunction(epsilon=1. / 10).method1)
+    bleu = SelfBleu(refs, weights, smoothing_function=SmoothingFunction(epsilon=1. / 10).method1, verbose=False)
     res = bleu.get_score()
     del bleu
     return res
@@ -37,9 +42,9 @@ def nltk_self_bleu(refs, hyps):
 
 
 def cpp_self_bleu(refs, hyps):
-    from fast_bleu.__python_wrapper import SelfBleu
+    from fast_bleu.__python_wrapper import SelfBLEU
     w = {i: list(np.ones(i) / (i)) for i in range(2, 6)}
-    bleu = SelfBleu(refs, w)
+    bleu = SelfBLEU(refs, w, verbose=False)
     res = bleu.get_score()
     del bleu
     return res[max_n]
@@ -61,10 +66,9 @@ def compare(nltk_func, cpp_func):
                                             names='nltk,cpp,diff')
     # print(all_in_one)
     print('sum diff ' + str(np.sum(all_in_one.diff)))
-    print('nltk: {}, cpp: {}, cpp speedup: {}'.format(nltk_time, cpp_time, float(nltk_time) / cpp_time))
+    print('nltk: {}, cpp: {}, cpp speedup: {}'.format(
+        nltk_time, cpp_time, float(nltk_time) / cpp_time))
 
-
-from nltk import ToktokTokenizer
 
 tokenizer = ToktokTokenizer().tokenize
 
@@ -83,12 +87,6 @@ for line in lines:
 
 print('tokenized!')
 
-from glob import glob
-
-import setuptools
-from setuptools.command.build_ext import build_ext
-from setuptools.extension import Extension
-
 
 class BuildExtWithoutPlatformSuffix(build_ext):
     def get_ext_filename(self, ext_name):
@@ -102,7 +100,7 @@ setup = setuptools.setup(
     name='fast_bleu',
     ext_modules=[
         Extension(
-            name="fast_bleu.fast_bleu_module",
+            name="fast_bleu.__fast_bleu_module",
             sources=glob('fast_bleu/cpp_sources/sources/*.cpp'),
             extra_compile_args=['-fopenmp', '-std=c++11'],
             extra_link_args=['-fopenmp', '-std=c++11'],
@@ -113,9 +111,9 @@ setup = setuptools.setup(
     script_args=['build_ext', '--build-lib', './']
 )
 
-compare(nltk_org_bleu, cpp_bleu)
+# compare(nltk_org_bleu, cpp_bleu)
 # compare(nltk_bleu, cpp_bleu)
-# compare(nltk_self_bleu, cpp_self_bleu)
+compare(nltk_self_bleu, cpp_self_bleu)
 
 # counter_test()
 

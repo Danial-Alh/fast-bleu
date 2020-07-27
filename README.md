@@ -1,4 +1,4 @@
-# FastBLEU Package
+# fast-bleu Package
 
 This is a fast multithreaded C++ implementation of NLTK BLEU; computing BLEU and SelfBLEU score for a fixed reference set.
 It can return (Self)BLEU for different (max) n-grams simultaneously and efficiently (e.g. BLEU-2, BLEU-3 and etc.).
@@ -7,7 +7,7 @@ It can return (Self)BLEU for different (max) n-grams simultaneously and efficien
 PyPI latest stable release
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-pip install --user FastBLEU
+pip install --user fast-bleu
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## Sample Usage

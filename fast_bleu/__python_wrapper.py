@@ -26,7 +26,7 @@ class BLEU:
     >>> ref3 = ['It', 'is', 'the', 'practical', 'guide', 'for', 'the',
     ...          'army', 'always', 'to', 'heed', 'the', 'directions',
     ...          'of', 'the', 'party']
-    
+
     >>> hyp1 = ['It', 'is', 'a', 'guide', 'to', 'action', 'which',
     ...         'ensures', 'that', 'the', 'military', 'always',
     ...         'obeys', 'the', 'commands', 'of', 'the', 'party']
@@ -48,7 +48,7 @@ class BLEU:
         BLEU-3 for hyp1 is 0.6240726901657495
         BLEU-3 for hyp2 is 0.013720869575946234
 
-        
+
     Parameters
     ----------
     lines_of_tokens : list
@@ -64,8 +64,9 @@ class BLEU:
     auto_reweight : bool, optional
         Option to re-normalize the weights uniformly, by default False.
     """
+
     def __init__(self, lines_of_tokens: list, weights: dict = {4: (1./4, 1./4, 1./4, 1./4)},
-                 smoothing_func: int = 1, auto_reweight: bool = False):
+                 smoothing_func: int = 1, auto_reweight: bool = False, verbose: bool = True):
         max_n = max(list(map(lambda x: len(x), weights.values())))
         min_n = min(list(map(lambda x: len(x), weights.values())))
         self.__weight_keys = list(weights.keys())
@@ -75,7 +76,8 @@ class BLEU:
         assert not (False in [sum(w) == 1. for w in self.__weights]), 'All weights must sum to one.'
         self.__init_cdll()
         lines_of_tokens = _encode_listoflist_str(lines_of_tokens)
-        self.__instance = self.__get_instance(lines_of_tokens, self.__weights, max_n, smoothing_func, auto_reweight)
+        self.__instance = self.__get_instance(
+            lines_of_tokens, self.__weights, max_n, smoothing_func, auto_reweight, verbose)
 
     def __init_cdll(self):
         self.__lib = _load_cdll()
@@ -94,14 +96,14 @@ class BLEU:
     def get_score(self, hypotheses: list):
         """
         computes BLEU-N score for each hypothesis.
-        
+
         Parameters
         ----------
         hypotheses : list
             Hypothesis set.
             List of list of tokens (list of hypotheses; each hypothesis is a list of token).
             **Caution** Each token is converted to string format during computation.
-        
+
         Returns
         -------
         dict
@@ -132,7 +134,7 @@ class SelfBLEU:
     >>> ref3 = ['It', 'is', 'the', 'practical', 'guide', 'for', 'the',
     ...          'army', 'always', 'to', 'heed', 'the', 'directions',
     ...          'of', 'the', 'party']
-    
+
     >>> hyp1 = ['It', 'is', 'a', 'guide', 'to', 'action', 'which',
     ...         'ensures', 'that', 'the', 'military', 'always',
     ...         'obeys', 'the', 'commands', 'of', 'the', 'party']
@@ -157,7 +159,7 @@ class SelfBLEU:
         SelfBLEU-3 for ref2 is 0.20140620205719248
         SelfBLEU-3 for ref3 is 0.21415334758254043
 
-        
+
     Parameters
     ----------
     lines_of_tokens : list
@@ -173,8 +175,9 @@ class SelfBLEU:
     auto_reweight : bool, optional
         Option to re-normalize the weights uniformly, by default False.
     """
+
     def __init__(self, lines_of_tokens: list, weights: dict = {4: (1./4, 1./4, 1./4, 1./4)},
-                 smoothing_func: int = 1, auto_reweight: bool = False):
+                 smoothing_func: int = 1, auto_reweight: bool = False, verbose: bool = True):
         max_n = max(list(map(lambda x: len(x), weights.values())))
         min_n = min(list(map(lambda x: len(x), weights.values())))
         self.__weight_keys = list(weights.keys())
@@ -184,7 +187,8 @@ class SelfBLEU:
         assert not (False in [sum(w) == 1. for w in self.__weights]), 'All weights must sum to one.'
         self.__init_cdll()
         lines_of_tokens = _encode_listoflist_str(lines_of_tokens)
-        self.__instance = self.__get_instance(lines_of_tokens, self.__weights, max_n, smoothing_func, auto_reweight)
+        self.__instance = self.__get_instance(
+            lines_of_tokens, self.__weights, max_n, smoothing_func, auto_reweight, verbose)
 
     def __init_cdll(self):
         self.__lib = _load_cdll()
@@ -203,7 +207,7 @@ class SelfBLEU:
     def get_score(self):
         """
         computes SelfBLEU-N score for each reference.
-        
+
         Returns
         -------
         dict

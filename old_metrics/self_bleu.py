@@ -12,18 +12,19 @@ from .utils import get_ngrams, Threader
 class SelfBleu():  # this class speedup computation when reference is same for multisample
     # Base on https://www.nltk.org/_modules/nltk/translate/bleu_score.html
     def __init__(self, references, weights=np.ones(3) / 3., smoothing_function=SmoothingFunction().method1,
-                 auto_reweigh=False, process_num=None, other_instance=None):
+                 auto_reweigh=False, process_num=None, other_instance=None, verbose=True):
         self.references = references
         self.weights = weights
         self.smoothing_function = smoothing_function
         self.auto_reweigh = auto_reweigh
         self.max_n = len(weights)
+        self.verbose = verbose
         if process_num is None:
             self.process_num = os.cpu_count()
         else:
             self.process_num = process_num
 
-        print('self-bleu{} init!'.format(self.max_n))
+        if self.verbose: print('self-bleu{} init!'.format(self.max_n))
         if other_instance is None:
             self.ref_lens = list(len(reference) for reference in references)
             self.references_ngrams = [get_ngrams(references, n + 1) for n in range(self.max_n)]
@@ -51,7 +52,7 @@ class SelfBleu():  # this class speedup computation when reference is same for m
                self.reference_max2_counts
 
     def get_score(self):
-        print('evaluating self-bleu {}!'.format(self.max_n))
+        if self.verbose: print('evaluating self-bleu {}!'.format(self.max_n))
         ref_max_counts = deepcopy(self.reference_max_counts)
         return [self.tmp_get_score(ref_max_counts, i) for i in range(len(self.references))]
 
@@ -74,7 +75,7 @@ class SelfBleu():  # this class speedup computation when reference is same for m
         return result
 
     def get_reference_max_counts(self, n):
-        print('calculating max counts n = %d!' % ((n + 1),))
+        if self.verbose: print('calculating max counts n = %d!' % ((n + 1),))
         ngram_keys = list(set([x for y in self.references_ngrams[n] for x in y]))
         thread_result = Threader(ngram_keys, self.tmp_get_reference_max_counts, show_tqdm=True).run()
         thread_result = np.array(thread_result)

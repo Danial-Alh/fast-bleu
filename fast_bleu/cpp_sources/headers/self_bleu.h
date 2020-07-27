@@ -13,7 +13,7 @@ class SELF_BLEU_CPP
 public:
   ~SELF_BLEU_CPP();
   SELF_BLEU_CPP();
-  SELF_BLEU_CPP(vector<vector<string>>, vector<vector<float>>, int, int, bool);
+  SELF_BLEU_CPP(vector<vector<string>>, vector<vector<float>>, int, int, bool, bool);
   vector<vector<double>> get_score();
 
 private:
@@ -29,6 +29,7 @@ private:
   int *ref_lens;
   int number_of_refs;
   int n_cores;
+  bool verbose;
 
   void get_max_counts(int);
 };

@@ -44,7 +44,7 @@ BLEU_CPP::~BLEU_CPP()
 }
 
 BLEU_CPP::BLEU_CPP(vector<vector<string>> lines_of_tokens, vector<vector<float>> weights,
-                   int max_n, int smoothing_func, bool auto_reweight)
+                   int max_n, int smoothing_func, bool auto_reweight, bool verbose)
 {
     this->n_cores = thread::hardware_concurrency();
     this->references = new vector<string> *[lines_of_tokens.size()];
@@ -62,8 +62,10 @@ BLEU_CPP::BLEU_CPP(vector<vector<string>> lines_of_tokens, vector<vector<float>>
     this->auto_reweigh = auto_reweigh;
     this->smoothing_function = smoothing_func;
     this->number_of_refs = (int)lines_of_tokens.size();
+    this->verbose = verbose;
 
-    cout << "bleu" << max_n << " init!" << endl;
+    if (this->verbose)
+        cout << "bleu" << max_n << " init!" << endl;
 
     for (int i = 0; i < this->number_of_refs; i++)
     {
@@ -89,7 +91,8 @@ void BLEU_CPP::get_max_counts(int n)
         for (string &ng : *this->references_ngrams[n][i])
             if (find(ngram_keys.begin(), ngram_keys.end(), ng) == ngram_keys.end())
                 ngram_keys.push_back(ng);
-    cout << n + 1 << "grams: " << ngram_keys.size() << endl;
+    if (this->verbose)
+        cout << n + 1 << "grams: " << ngram_keys.size() << endl;
 
     int temp_max_counts[ngram_keys.size()];
 #pragma omp parallel
