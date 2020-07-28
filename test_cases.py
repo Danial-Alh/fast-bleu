@@ -76,13 +76,15 @@ ref_tokens = []
 test_tokens = []
 
 with open('data/t.txt') as file:
+# with open('data/coco60-test.txt') as file:
     lines = file.readlines()
-for line in lines:
+for line in lines[:500]:
     ref_tokens.append(tokenizer(line))
 
 with open('data/g.txt') as file:
+# with open('data/coco60-train.txt') as file:
     lines = file.readlines()
-for line in lines:
+for line in lines[:500]:
     test_tokens.append(tokenizer(line))
 
 print('tokenized!')
@@ -111,9 +113,9 @@ setup = setuptools.setup(
     script_args=['build_ext', '--build-lib', './']
 )
 
-# compare(nltk_org_bleu, cpp_bleu)
+compare(nltk_org_bleu, cpp_bleu)
 # compare(nltk_bleu, cpp_bleu)
-compare(nltk_self_bleu, cpp_self_bleu)
+# compare(nltk_self_bleu, cpp_self_bleu)
 
 # counter_test()
 
