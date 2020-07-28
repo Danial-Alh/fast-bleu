@@ -76,14 +76,14 @@ tokenizer = ToktokTokenizer().tokenize
 ref_tokens = []
 test_tokens = []
 
-with open('data/t.txt') as file:
-# with open('data/coco60-test.txt') as file:
+# with open('data/t.txt') as file:
+with open('data/coco60-test.txt') as file:
     lines = file.readlines()
 for line in lines:
     ref_tokens.append(tokenizer(line))
 
-with open('data/g.txt') as file:
-# with open('data/coco60-train.txt') as file:
+# with open('data/g.txt') as file:
+with open('data/coco60-train.txt') as file:
     lines = file.readlines()
 for line in lines:
     test_tokens.append(tokenizer(line))
@@ -118,8 +118,8 @@ setup = setuptools.setup(
 # compare(nltk_bleu, cpp_bleu)
 # compare(nltk_self_bleu, cpp_self_bleu)
 
-res, ti = get_execution_time(cpp_bleu)
-# res, ti = get_execution_time(cpp_self_bleu)
+# res, ti = get_execution_time(cpp_bleu)
+res, ti = get_execution_time(cpp_self_bleu)
 res = np.mean(res)
 print(res, ti)
 

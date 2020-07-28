@@ -66,7 +66,7 @@ class BLEU:
     """
 
     def __init__(self, lines_of_tokens: list, weights: dict = {4: (1./4, 1./4, 1./4, 1./4)},
-                 smoothing_func: int = 1, auto_reweight: bool = False, verbose: bool = True):
+                 smoothing_func: int = 1, auto_reweight: bool = False, verbose: bool = False):
         max_n = max(list(map(lambda x: len(x), weights.values())))
         min_n = min(list(map(lambda x: len(x), weights.values())))
         self.__weight_keys = list(weights.keys())
@@ -177,7 +177,7 @@ class SelfBLEU:
     """
 
     def __init__(self, lines_of_tokens: list, weights: dict = {4: (1./4, 1./4, 1./4, 1./4)},
-                 smoothing_func: int = 1, auto_reweight: bool = False, verbose: bool = True):
+                 smoothing_func: int = 1, auto_reweight: bool = False, verbose: bool = False):
         max_n = max(list(map(lambda x: len(x), weights.values())))
         min_n = min(list(map(lambda x: len(x), weights.values())))
         self.__weight_keys = list(weights.keys())
