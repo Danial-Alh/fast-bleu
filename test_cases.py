@@ -28,13 +28,14 @@ def nltk_bleu(refs, hyps):
 def cpp_bleu(refs, hyps):
     print(BLEU)
     w = {i: list(np.ones(i) / (i)) for i in range(2, 6)}
-    bleu = BLEU(refs, w, verbose=False)
+    bleu = BLEU(refs, w, verbose=True)
     return bleu.get_score(hyps)[max_n]
 
 
 def nltk_self_bleu(refs, hyps):
     from old_metrics.self_bleu import SelfBleu
-    bleu = SelfBleu(refs, weights, smoothing_function=SmoothingFunction(epsilon=1. / 10).method1, verbose=False)
+    bleu = SelfBleu(refs, weights, smoothing_function=SmoothingFunction(
+        epsilon=1. / 10).method1, verbose=False)
     res = bleu.get_score()
     del bleu
     return res
@@ -44,23 +45,23 @@ def nltk_self_bleu(refs, hyps):
 def cpp_self_bleu(refs, hyps):
     from fast_bleu.__python_wrapper import SelfBLEU
     w = {i: list(np.ones(i) / (i)) for i in range(2, 6)}
-    bleu = SelfBLEU(refs, w, verbose=False)
+    bleu = SelfBLEU(refs, w, verbose=True)
     res = bleu.get_score()
     del bleu
     return res[max_n]
 
 
-def compare(nltk_func, cpp_func):
+def get_execution_time(func):
     import time
     start = time.time()
-    cpp_result = np.array(cpp_func(ref_tokens, test_tokens))
+    result = np.array(func(ref_tokens, test_tokens))
     end = time.time()
-    cpp_time = end - start
+    return result, end-start
 
-    start = time.time()
-    nltk_result = np.array(nltk_func(ref_tokens, test_tokens))
-    end = time.time()
-    nltk_time = end - start
+
+def compare(nltk_func, cpp_func):
+    cpp_result, cpp_time = get_execution_time(cpp_func)
+    nltk_result, nltk_time = get_execution_time(nltk_func)
 
     all_in_one = np.core.records.fromarrays([nltk_result, cpp_result, np.abs(nltk_result - cpp_result)],
                                             names='nltk,cpp,diff')
@@ -78,13 +79,13 @@ test_tokens = []
 with open('data/t.txt') as file:
 # with open('data/coco60-test.txt') as file:
     lines = file.readlines()
-for line in lines[:500]:
+for line in lines:
     ref_tokens.append(tokenizer(line))
 
 with open('data/g.txt') as file:
 # with open('data/coco60-train.txt') as file:
     lines = file.readlines()
-for line in lines[:500]:
+for line in lines:
     test_tokens.append(tokenizer(line))
 
 print('tokenized!')
@@ -113,9 +114,14 @@ setup = setuptools.setup(
     script_args=['build_ext', '--build-lib', './']
 )
 
-compare(nltk_org_bleu, cpp_bleu)
+# compare(nltk_org_bleu, cpp_bleu)
 # compare(nltk_bleu, cpp_bleu)
 # compare(nltk_self_bleu, cpp_self_bleu)
+
+res, ti = get_execution_time(cpp_bleu)
+# res, ti = get_execution_time(cpp_self_bleu)
+res = np.mean(res)
+print(res, ti)
 
 # counter_test()
 

@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <utility>
 #include <thread>
+#include <set>
 #include <stdexcept>
 #include <limits>
 #include "self_bleu.h"
@@ -85,11 +86,10 @@ SELF_BLEU_CPP::SELF_BLEU_CPP(vector<vector<string>> lines_of_tokens, vector<vect
             this->references_counts[n][i] = new Counter(this->references_ngrams[n][i]);
         }
         this->get_max_counts(n);
-
     }
 }
 
-void SELF_BLEU_CPP::get_max_counts(int n)
+void SELF_BLEU_CPP::get_max_counts_old(int n)
 {
     this->reference_max_counts[n] = new CustomMap();
     this->reference_max2_counts[n] = new CustomMap();
@@ -98,7 +98,7 @@ void SELF_BLEU_CPP::get_max_counts(int n)
         for (string &ng : *(this->references_ngrams[n][i]))
             if (find(ngram_keys.begin(), ngram_keys.end(), ng) == ngram_keys.end())
                 ngram_keys.push_back(ng);
-    if (this->verbose)                
+    if (this->verbose)
         cout << n + 1 << "grams: " << ngram_keys.size() << endl;
 
     int temp_max_counts[ngram_keys.size()];
@@ -129,15 +129,72 @@ void SELF_BLEU_CPP::get_max_counts(int n)
     }
 }
 
+void SELF_BLEU_CPP::get_max_counts(int n)
+{
+    this->reference_max_counts[n] = new CustomMap();
+    this->reference_max2_counts[n] = new CustomMap();
+    set<string> ngrams_set = set<string>();
+
+    for (int i = 0; i < this->number_of_refs; i++)
+        for (auto &ngram_count : *this->references_counts[n][i])
+            ngrams_set.insert(ngram_count.first);
+
+    if (this->verbose)
+        cout << n + 1 << "grams: " << ngrams_set.size() << endl;
+
+    auto ngrams_set_list = vector<string>(ngrams_set.cbegin(), ngrams_set.cend());
+    auto temp_ngram_counts = map<string, vector<int>>();
+
+    int temp_max_counts[ngrams_set.size()];
+    int temp_max2_counts[ngrams_set.size()];
+
+    for (string &ng : ngrams_set_list)
+        temp_ngram_counts.insert(pair<string, vector<int>>(ng, vector<int>()));
+
+    for (int j = 0; j < number_of_refs; j++)
+        for (auto &ngram_count : *references_counts[n][j])
+            temp_ngram_counts[ngram_count.first].push_back(ngram_count.second);
+
+    vector<int>::iterator max_val_ptr;
+    string ng;
+    // #pragma omp parallel
+    {
+        // #pragma omp for schedule(guided) private(max_val_ptr, ng)
+        for (int i = 0; i < (int)ngrams_set_list.size(); i++)
+        {
+            ng = ngrams_set_list.at(i);
+            max_val_ptr = max_element(temp_ngram_counts[ng].begin(),
+                                      temp_ngram_counts[ng].end());
+            temp_max_counts[i] = *max_val_ptr;
+            if (temp_ngram_counts[ng].size() == 1)
+                temp_max2_counts[i] = 0;
+            else
+            {
+                (*max_val_ptr) = -1;
+                max_val_ptr = max_element(temp_ngram_counts[ng].begin(),
+                                          temp_ngram_counts[ng].end());
+                temp_max2_counts[i] = *max_val_ptr;
+            }
+        }
+    }
+
+    for (int i = 0; i < (int)ngrams_set_list.size(); i++)
+    {
+        string &ng = ngrams_set_list.at(i);
+        (*reference_max_counts[n])[ng] = temp_max_counts[i];
+        (*reference_max2_counts[n])[ng] = temp_max2_counts[i];
+    }
+}
+
 vector<vector<double>> SELF_BLEU_CPP::get_score()
 {
     vector<vector<double>> results;
-    for (vector<float> &w: this->weights)
+    for (vector<float> &w : this->weights)
     {
         double temp_results[number_of_refs];
         int curr_n = w.size();
 
-//        cout << "calculating self_bleu" << curr_n << " scores!" << endl;
+        //        cout << "calculating self_bleu" << curr_n << " scores!" << endl;
 
         vector<string> *refs[number_of_refs - 1];
         int lens[number_of_refs - 1];
@@ -174,13 +231,13 @@ vector<vector<double>> SELF_BLEU_CPP::get_score()
                 }
             vector<string> *hypothesis = references[i];
             temp_results[i] = corpus_bleu(number_of_refs, curr_n,
-                                    refs,
-                                    hypothesis,
-                                    ref_max_counts,
-                                    lens,
-                                    w,
-                                    smoothing_function,
-                                    auto_reweigh);
+                                          refs,
+                                          hypothesis,
+                                          ref_max_counts,
+                                          lens,
+                                          w,
+                                          smoothing_function,
+                                          auto_reweigh);
             for (int n = 0; n < curr_n; n++)
                 for (pair<string, int> const &p : *(references_counts[n][i]))
                 {

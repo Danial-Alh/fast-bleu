@@ -31,6 +31,7 @@ private:
   bool verbose;
 
   void get_max_counts(int);
+  void get_max_counts_old(int);
 };
 
 #endif

@@ -84,41 +84,43 @@ BLEU_CPP::BLEU_CPP(vector<vector<string>> lines_of_tokens, vector<vector<float>>
     }
 }
 
-// void BLEU_CPP::get_max_counts(int n)
-// {
-//     this->reference_max_counts[n] = new CustomMap();
-//     vector<string> ngram_keys = vector<string>();
-//     for (int i = 0; i < this->number_of_refs; i++)
-//         for (string &ng : *this->references_ngrams[n][i])
-//             if (find(ngram_keys.begin(), ngram_keys.end(), ng) == ngram_keys.end())
-//                 ngram_keys.push_back(ng);
-//     if (this->verbose)
-//         cout << n + 1 << "grams: " << ngram_keys.size() << endl;
+void BLEU_CPP::get_max_counts_old(int n)
+{
+    this->reference_max_counts[n] = new CustomMap();
+    vector<string> ngram_keys = vector<string>();
+    for (int i = 0; i < this->number_of_refs; i++)
+        for (string &ng : *this->references_ngrams[n][i])
+            if (find(ngram_keys.begin(), ngram_keys.end(), ng) == ngram_keys.end())
+                ngram_keys.push_back(ng);
+    if (this->verbose)
+        cout << n + 1 << "grams: " << ngram_keys.size() << endl;
 
-//     int temp_max_counts[ngram_keys.size()];
-// #pragma omp parallel
-//     {
-// #pragma omp for schedule(guided)
-//         for (int i = 0; i < (int)ngram_keys.size(); i++)
-//         {
-//             string &ng = ngram_keys[i];
-//             int max_value = 0;
-//             for (int j = 0; j < number_of_refs; j++)
-//             {
-//                 int temp_value = references_counts[n][j]->get(ng);
-//                 if (temp_value > max_value) max_value = temp_value;
-//             }
-//             temp_max_counts[i] = max_value;
-//         }
-//     }
-//     for (int i = 0; i < (int)ngram_keys.size(); i++)
-//         (*reference_max_counts[n])[ngram_keys[i]] = temp_max_counts[i];
-// }
+    int temp_max_counts[ngram_keys.size()];
+#pragma omp parallel
+    {
+#pragma omp for schedule(guided)
+        for (int i = 0; i < (int)ngram_keys.size(); i++)
+        {
+            string &ng = ngram_keys[i];
+            int max_value = 0;
+            for (int j = 0; j < number_of_refs; j++)
+            {
+                int temp_value = references_counts[n][j]->get(ng);
+                if (temp_value > max_value)
+                    max_value = temp_value;
+            }
+            temp_max_counts[i] = max_value;
+        }
+    }
+    for (int i = 0; i < (int)ngram_keys.size(); i++)
+        (*reference_max_counts[n])[ngram_keys[i]] = temp_max_counts[i];
+}
 
 void BLEU_CPP::get_max_counts(int n)
 {
     this->reference_max_counts[n] = new CustomMap();
     set<string> ngrams_set = set<string>();
+
     for (int i = 0; i < this->number_of_refs; i++)
         for (auto &ngram_count : *this->references_counts[n][i])
             ngrams_set.insert(ngram_count.first);
@@ -126,30 +128,31 @@ void BLEU_CPP::get_max_counts(int n)
     if (this->verbose)
         cout << n + 1 << "grams: " << ngrams_set.size() << endl;
 
+    auto ngrams_set_list = vector<string>(ngrams_set.cbegin(), ngrams_set.cend());
+    auto temp_ngram_counts = map<string, vector<int>>();
     int temp_max_counts[ngrams_set.size()];
-    map<string, vector<int>> temp_ngram_counts = map<string, vector<int>>();
-    vector<string> ngrams_set_list = vector<string>(ngrams_set.cbegin(), ngrams_set.cend());
 
     for (string &ng : ngrams_set_list)
         temp_ngram_counts.insert(pair<string, vector<int>>(ng, vector<int>()));
 
     for (int j = 0; j < number_of_refs; j++)
-    {
         for (auto &ngram_count : *references_counts[n][j])
             temp_ngram_counts[ngram_count.first].push_back(ngram_count.second);
-    }
 
     int max_val;
+    string ng;
 #pragma omp parallel
     {
-#pragma omp for schedule(guided) private(max_val)
+#pragma omp for schedule(guided) private(max_val, ng)
         for (int i = 0; i < (int)ngrams_set_list.size(); i++)
         {
-            max_val = *max_element(temp_ngram_counts[ngrams_set_list.at(i)].cbegin(),
-                                   temp_ngram_counts[ngrams_set_list.at(i)].cend());
+            ng = ngrams_set_list.at(i);
+            max_val = *max_element(temp_ngram_counts[ng].cbegin(),
+                                   temp_ngram_counts[ng].cend());
             temp_max_counts[i] = max_val;
         }
     }
+
     for (int i = 0; i < (int)ngrams_set_list.size(); i++)
         (*reference_max_counts[n])[ngrams_set_list.at(i)] = temp_max_counts[i];
 }
