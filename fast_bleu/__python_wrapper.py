@@ -73,7 +73,7 @@ class BLEU:
         self.__weights = [list(weights[k]) for k in self.__weight_keys]
         assert 2 <= min_n <= max_n, '2 <= min_n <= max_n; got 2 <= {} <= {}'.format(min_n, max_n)
         assert smoothing_func in [0, 1], 'Smoothing function only supports 0 or 1 type.'
-        assert not (False in [sum(w) == 1. for w in self.__weights]), 'All weights must sum to one.'
+        assert not (False in [abs(1. - sum(w)) < 1e-15 for w in self.__weights]), 'All weights must sum to one.'
         self.__init_cdll()
         lines_of_tokens = _encode_listoflist_str(lines_of_tokens)
         self.__instance = self.__get_instance(
@@ -184,7 +184,7 @@ class SelfBLEU:
         self.__weights = [list(weights[k]) for k in self.__weight_keys]
         assert 2 <= min_n <= max_n, '2 <= min_n <= max_n; got 2 <= {} <= {}'.format(min_n, max_n)
         assert smoothing_func in [0, 1], 'Smoothing function only supports 0 or 1 type.'
-        assert not (False in [sum(w) == 1. for w in self.__weights]), 'All weights must sum to one.'
+        assert not (False in [abs(1. - sum(w)) < 1e-15 for w in self.__weights]), 'All weights must sum to one.'
         self.__init_cdll()
         lines_of_tokens = _encode_listoflist_str(lines_of_tokens)
         self.__instance = self.__get_instance(
