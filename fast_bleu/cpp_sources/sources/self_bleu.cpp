@@ -155,15 +155,13 @@ void SELF_BLEU_CPP::get_max_counts(int n)
         for (auto &ngram_count : *references_counts[n][j])
             temp_ngram_counts[ngram_count.first].push_back(ngram_count.second);
 
-    vector<int>::iterator max_val_ptr;
-    string ng;
     #pragma omp parallel
     {
-        #pragma omp for schedule(guided) private(max_val_ptr, ng)
+        #pragma omp for schedule(guided)
         for (int i = 0; i < (int)ngrams_set_list.size(); i++)
         {
-            ng = ngrams_set_list.at(i);
-            max_val_ptr = max_element(temp_ngram_counts[ng].begin(),
+            string ng = ngrams_set_list.at(i);
+            vector<int>::iterator max_val_ptr = max_element(temp_ngram_counts[ng].begin(),
                                       temp_ngram_counts[ng].end());
             temp_max_counts[i] = *max_val_ptr;
             if (temp_ngram_counts[ng].size() == 1)

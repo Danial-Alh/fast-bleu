@@ -1,4 +1,5 @@
 import ctypes
+import faulthandler
 
 
 def _encode_listoflist_str(data):
@@ -8,7 +9,8 @@ def _encode_listoflist_str(data):
 def _load_cdll():
     import os
     curr_path = os.path.dirname(__file__) + '/'
-    return ctypes.cdll.LoadLibrary(curr_path + '__fast_bleu_module.so')
+    return ctypes.CDLL(curr_path + '__fast_bleu_module.so',
+                                   use_errno=True)
 
 
 class BLEU:
@@ -73,11 +75,17 @@ class BLEU:
         self.__weights = [list(weights[k]) for k in self.__weight_keys]
         assert 2 <= min_n <= max_n, '2 <= min_n <= max_n; got 2 <= {} <= {}'.format(min_n, max_n)
         assert smoothing_func in [0, 1], 'Smoothing function only supports 0 or 1 type.'
-        assert not (False in [abs(1. - sum(w)) < 1e-15 for w in self.__weights]), 'All weights must sum to one.'
+        assert not (False in [abs(1. - sum(w)) < 1e-15 for w in self.__weights]
+                    ), 'All weights must sum to one.'
         self.__init_cdll()
         lines_of_tokens = _encode_listoflist_str(lines_of_tokens)
+
+        faulthandler_enabled = faulthandler.is_enabled()
+        faulthandler.enable()
         self.__instance = self.__get_instance(
             lines_of_tokens, self.__weights, max_n, smoothing_func, auto_reweight, verbose)
+        if not faulthandler_enabled:
+            faulthandler.disable()
 
     def __init_cdll(self):
         self.__lib = _load_cdll()
@@ -111,7 +119,11 @@ class BLEU:
             Each BLEU-N is identified by a key according to the keys provided by 'weights' in __init__.
         """
         hypotheses = _encode_listoflist_str(hypotheses)
+        faulthandler_enabled = faulthandler.is_enabled()
+        faulthandler.enable()
         result = self.__get_score(self.__instance, hypotheses)
+        if not faulthandler_enabled:
+            faulthandler.disable()
         return {self.__weight_keys[i]: r for i, r in enumerate(result)}
 
     def __del__(self):
@@ -184,11 +196,17 @@ class SelfBLEU:
         self.__weights = [list(weights[k]) for k in self.__weight_keys]
         assert 2 <= min_n <= max_n, '2 <= min_n <= max_n; got 2 <= {} <= {}'.format(min_n, max_n)
         assert smoothing_func in [0, 1], 'Smoothing function only supports 0 or 1 type.'
-        assert not (False in [abs(1. - sum(w)) < 1e-15 for w in self.__weights]), 'All weights must sum to one.'
+        assert not (False in [abs(1. - sum(w)) < 1e-15 for w in self.__weights]
+                    ), 'All weights must sum to one.'
         self.__init_cdll()
         lines_of_tokens = _encode_listoflist_str(lines_of_tokens)
+
+        faulthandler_enabled = faulthandler.is_enabled()
+        faulthandler.enable()
         self.__instance = self.__get_instance(
             lines_of_tokens, self.__weights, max_n, smoothing_func, auto_reweight, verbose)
+        if not faulthandler_enabled:
+            faulthandler.disable()
 
     def __init_cdll(self):
         self.__lib = _load_cdll()
@@ -214,7 +232,11 @@ class SelfBLEU:
             SelfBLEU-N score of each hypothesis. 
             Each SelfBLEU-N is identified by a key according to the keys provided by 'weights' in __init__.
         """
+        faulthandler_enabled = faulthandler.is_enabled()
+        faulthandler.enable()
         result = self.__get_score(self.__instance)
+        if not faulthandler_enabled:
+            faulthandler.disable()
         return {self.__weight_keys[i]: r for i, r in enumerate(result)}
 
     def __del__(self):

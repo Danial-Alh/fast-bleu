@@ -17,7 +17,7 @@ with open("README.md", "r") as fh:
 include_dirs = ['fast_bleu/cpp_sources/headers/']
 setup = setuptools.setup(
     name='fast-bleu',
-    version="0.0.83",
+    version="0.0.84",
     author="Danial Alihosseini",
     author_email="danial.alihosseini@gmail.com",
     description="A fast multithreaded C++ implementation of nltk BLEU.",
@@ -40,7 +40,7 @@ setup = setuptools.setup(
         "Operating System :: POSIX :: Linux",
         "Development Status :: 3 - Alpha",
     ],
-    python_requires='>=3',
+    python_requires='>=3.3',
     install_requires=[],
     obsoletes=["FastBLEU"],
     platforms=['POSIX :: Linux'],

@@ -118,8 +118,8 @@ setup = setuptools.setup(
 # compare(nltk_bleu, cpp_bleu)
 # compare(nltk_self_bleu, cpp_self_bleu)
 
-# res, ti = get_execution_time(cpp_bleu)
-res, ti = get_execution_time(cpp_self_bleu)
+res, ti = get_execution_time(cpp_bleu)
+# res, ti = get_execution_time(cpp_self_bleu)
 res = np.mean(res)
 print(res, ti)
 
