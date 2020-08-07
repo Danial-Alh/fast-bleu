@@ -100,6 +100,8 @@ PyObject *vector2list_double(const vector<double> &data)
 
 PyObject *vectorofvector2listoflist_double(const vector<vector<double>> &data)
 {
+    PyGILState_STATE gstate = PyGILState_Ensure();
+
     PyObject *listObj = PyList_New(data.size());
     if (!listObj)
         throw logic_error("Unable to allocate memory for Python list");
@@ -113,6 +115,8 @@ PyObject *vectorofvector2listoflist_double(const vector<vector<double>> &data)
         }
         PyList_SET_ITEM(listObj, i, sub_list);
     }
+
+    PyGILState_Release(gstate);
     return listObj;
 }
 
