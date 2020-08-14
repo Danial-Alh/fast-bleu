@@ -8,6 +8,31 @@ from setuptools.extension import Extension
 from setuptools.command.install import install
 
 
+class CleanCommand(setuptools.Command):
+    """
+    Our custom command to clean out junk files.
+    """
+    description = "Cleans out junk files we don't want in the repo"
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        cmd_list = dict(
+            build="set -x; rm -rf ./build",
+            dist="set -x; rm -rf ./dist",
+            egg="set -x; rm -rf ./fast_bleu.egg-info",
+            pyc="pyc",
+            so="set -x; find . -name '*.so' -exec rm -rf {} \;"
+        )
+        for key, cmd in cmd_list.items():
+            os.system(cmd)
+
+
 class InstallCommand(install):
     user_options = install.user_options + [
         ('CC=', None, '<gcc binary path>'),
@@ -60,7 +85,11 @@ setup = setuptools.setup(
             extra_link_args=['-fopenmp', '-std=c++11'],
             include_dirs=['fast_bleu/cpp_sources/headers/'],
         ), ],
-    cmdclass={'install': InstallCommand, 'build_ext': BuildExtWithoutPlatformSuffix},
+    cmdclass={
+        'install': InstallCommand,
+        'build_ext': BuildExtWithoutPlatformSuffix,
+        'clean': CleanCommand
+    },
     packages=['fast_bleu'],
     classifiers=[
         "Programming Language :: Python :: 3",

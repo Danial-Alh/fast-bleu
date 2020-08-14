@@ -21,7 +21,7 @@ and `g++-10`).
 To change the default compiler, an option to the installation command is added. So you can install the [PyPI latest stable release](https://pypi.org/project/fast-bleu/) with the following command:
 
 ``` bash
-pip install fast-bleu --install-option="--CC=<path-to-gcc>" --install-option="--CXX=<path-to-g++>"
+pip install --user fast-bleu --install-option="--CC=<path-to-gcc>" --install-option="--CXX=<path-to-g++>"
 ```
 
 ### Windows

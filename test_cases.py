@@ -1,11 +1,12 @@
-from setuptools.extension import Extension
-from setuptools.command.build_ext import build_ext
-import setuptools
+import os
+
 from glob import glob
 from nltk import ToktokTokenizer
 import numpy as np
 from nltk.translate.bleu_score import SmoothingFunction
 from fast_bleu import *
+
+os.system("set -x; python setup.py build_ext --build-lib=./")
 
 # min_n = 2
 max_n = 5
@@ -90,29 +91,6 @@ for line in lines:
 
 print('tokenized!')
 
-
-class BuildExtWithoutPlatformSuffix(build_ext):
-    def get_ext_filename(self, ext_name):
-        super().get_ext_filename(ext_name)
-        return ext_name + '.so'
-    # pass
-
-
-include_dirs = ['fast_bleu/cpp_sources/headers/']
-setup = setuptools.setup(
-    name='fast_bleu',
-    ext_modules=[
-        Extension(
-            name="fast_bleu.__fast_bleu_module",
-            sources=glob('fast_bleu/cpp_sources/sources/*.cpp'),
-            extra_compile_args=['-fopenmp', '-std=c++11'],
-            extra_link_args=['-fopenmp', '-std=c++11'],
-            include_dirs=include_dirs,
-        ), ],
-    packages=['fast_bleu'],
-    cmdclass={'build_ext': BuildExtWithoutPlatformSuffix},
-    script_args=['build_ext', '--build-lib', './']
-)
 
 # compare(nltk_org_bleu, cpp_bleu)
 # compare(nltk_bleu, cpp_bleu)
