@@ -48,7 +48,7 @@ setup = setuptools.setup(
     version="0.0.86",
     author="Danial Alihosseini",
     author_email="danial.alihosseini@gmail.com",
-    description="A fast multithreaded C++ implementation of nltk BLEU.",
+    description="A fast multithreaded C++ implementation of nltk BLEU with python wrapper.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/Danial-Alh/fast-bleu",
@@ -66,11 +66,12 @@ setup = setuptools.setup(
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: POSIX :: Linux",
+        "Operating System :: MacOS",
         "Development Status :: 3 - Alpha",
     ],
     python_requires='>=3.3',
     install_requires=[],
     obsoletes=["FastBLEU"],
-    platforms=['POSIX :: Linux'],
+    platforms=['POSIX :: Linux', 'MacOS'],
     license='OSI Approved :: MIT License'
 )

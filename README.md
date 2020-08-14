@@ -4,16 +4,35 @@ This is a fast multithreaded C++ implementation of NLTK BLEU with Python wrapper
 It can return (Self)BLEU for different (max) n-grams simultaneously and efficiently (e.g. BLEU-2, BLEU-3 and etc.).
 
 ## Installation
-PyPI latest stable release
 
-~~~~~~~~~~~~~~~~~~~~~~~~
+### Linux and WSL
+
+Installing [PyPI latest stable release](https://pypi.org/project/fast-bleu/):
+
+``` bash
 pip install --user fast-bleu
-~~~~~~~~~~~~~~~~~~~~~~~~
+```
+
+### MacOS
+
+As the macOS uses clang and it does not support OpenMP; one workaround is to first install gcc with `brew install gcc`. After that, gcc specific binaries will be added (for example, it will be maybe `gcc-10`
+and `g++-10`).
+
+To change the default compiler, an option to the installation command is added. So you can install the [PyPI latest stable release](https://pypi.org/project/fast-bleu/) with the following command:
+
+``` bash
+pip install fast-bleu --install-option="--CC=<path-to-gcc>" --install-option="--CXX=<path-to-g++>"
+```
+
+### Windows
+
+Not tested yet!
 
 ## Sample Usage
+
 Here is an example to compute BLEU-2, BLEU-3, SelfBLEU-2 and SelfBLEU-3:
 
-```python
+``` python
 >>> from fast_bleu import BLEU, SelfBLEU
 >>> ref1 = ['It', 'is', 'a', 'guide', 'to', 'action', 'that',
 ...          'ensures', 'that', 'the', 'military', 'will', 'forever',
@@ -41,6 +60,7 @@ Here is an example to compute BLEU-2, BLEU-3, SelfBLEU-2 and SelfBLEU-3:
 ```
 
 which means:
+
 * BLEU-2 for hyp1 is 0.7453559924999299
 * BLEU-2 for hyp2 is 0.0191380231127159
 
@@ -54,7 +74,8 @@ which means:
         'trigram': [0.07808966062765045, 0.20140620205719248, 0.21415334758254043]}
 ```
 
-which means: 
+which means:
+
 * SelfBLEU-2 for ref1 is 0.25819888974716115
 * SelfBLEU-2 for ref2 is 0.3615507630310936
 * SelfBLEU-2 for ref3 is 0.37080992435478316
@@ -67,12 +88,12 @@ which means:
 
 For further details, refer to the documentation provided in the source codes.
 
-# Citation
+## Citation
 
 Please cite our paper if it helps with your research.
 
-* ACL Anthology: https://www.aclweb.org/anthology/W19-2311
-* Arxiv link: https://arxiv.org/abs/1904.03971
+* ACL Anthology: <https://www.aclweb.org/anthology/W19-2311>
+* Arxiv link: <https://arxiv.org/abs/1904.03971>
 
 ```latex
 @inproceedings{alihosseini-etal-2019-jointly,
