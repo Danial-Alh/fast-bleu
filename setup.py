@@ -26,8 +26,8 @@ class CleanCommand(setuptools.Command):
             build="set -x; rm -rf ./build",
             dist="set -x; rm -rf ./dist",
             egg="set -x; rm -rf ./fast_bleu.egg-info",
-            pyc="pyc",
-            so="set -x; find . -name '*.so' -exec rm -rf {} \;"
+            so="set -x; find . -name '*.so' -exec rm -rf {} \;",
+            pyc="set -x; find . -name '*.pyc' -exec rm -rf {} \;"
         )
         for key, cmd in cmd_list.items():
             os.system(cmd)
@@ -70,7 +70,7 @@ with open("README.md", "r") as fh:
 
 setup = setuptools.setup(
     name='fast-bleu',
-    version="0.0.86",
+    version="0.0.87",
     author="Danial Alihosseini",
     author_email="danial.alihosseini@gmail.com",
     description="A fast multithreaded C++ implementation of nltk BLEU with python wrapper.",
@@ -81,8 +81,8 @@ setup = setuptools.setup(
         Extension(
             name="fast_bleu.__fast_bleu_module",
             sources=glob('fast_bleu/cpp_sources/sources/*.cpp'),
-            extra_compile_args=['-fopenmp', '-std=c++11'],
-            extra_link_args=['-fopenmp', '-std=c++11'],
+            extra_compile_args=['-fopenmp', '-std=c++17', '-Werror', '-pedantic-errors', '-Wall', '-Wextra'],
+            extra_link_args=['-fopenmp', '-std=c++17', '-Werror', '-pedantic-errors', '-Wall', '-Wextra'],
             include_dirs=['fast_bleu/cpp_sources/headers/'],
         ), ],
     cmdclass={

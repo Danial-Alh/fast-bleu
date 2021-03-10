@@ -73,11 +73,13 @@ Fraction modified_precision(CustomMap **reference_max_counts,
 
 int closest_ref_length(int num_refs, int *ref_lens, int hyp_len)
 {
-    tuple<int, int> tmp[num_refs];
+    tuple<int, int> *tmp = new tuple<int, int>[num_refs];
     for (int i = 0; i < num_refs; i++)
         tmp[i] = make_tuple(abs(ref_lens[i] - hyp_len), ref_lens[i]);
     tuple<int, int> closest_ref_len = *min_element(tmp, tmp + num_refs);
-    return get<1>(closest_ref_len);
+    int result = get<1>(closest_ref_len);
+    delete[] tmp;
+    return result;
 }
 
 double brevity_penalty(int closest_ref_len, int hyp_len)
@@ -91,25 +93,24 @@ double brevity_penalty(int closest_ref_len, int hyp_len)
 }
 
 double corpus_bleu(int num_refs, int max_n,
-                   vector<string> **references,
+                   [[maybe_unused]] vector<string> **references,
                    vector<string> *hypothesis,
                    CustomMap **reference_max_counts,
                    int *ref_lens,
                    vector<float> weights,
                    int smoothing_function,
-                   bool auto_reweigh)
+                   bool auto_reweight)
 {
-    long long p_numerators[max_n] = {0};   // Key = ngram order, and value = no. of ngram matches.
-    long long p_denominators[max_n] = {0}; // Key = ngram order, and value = no. of ngram in ref.
+    Fraction *p_n = new Fraction[max_n];
+    // Key = ngram order
+    // numerator value = no. of ngram matches.
+    // denominator  value = no. of ngram in ref.
+
     int hyp_lengths = 0, ref_lengths = 0;
     void (*smoothing_functions[])(int, Fraction *) = {&smooth_0, &smooth_1};
 
     for (int i = 0; i < max_n; i++)
-    {
-        Fraction p_i = modified_precision(reference_max_counts, hypothesis, i + 1);
-        p_numerators[i] += p_i.numerator;
-        p_denominators[i] += p_i.denominator;
-    }
+        p_n[i] = modified_precision(reference_max_counts, hypothesis, i + 1);
 
     int hyp_len = hypothesis->size();
     hyp_lengths += hyp_len;
@@ -118,16 +119,12 @@ double corpus_bleu(int num_refs, int max_n,
     double bp = brevity_penalty(ref_lengths, hyp_lengths);
 
     float temp_weights[4] = {0.25};
-    if (auto_reweigh)
+    if (auto_reweight)
         if (hyp_lengths < 4 && equal(weights.begin(), weights.end(), temp_weights))
             for (int i = 0; i < max_n; i++)
                 weights[i] = 1. / hyp_lengths;
 
-    Fraction p_n[max_n];
-    for (int i = 0; i < max_n; i++)
-        p_n[i] = Fraction(p_numerators[i], p_denominators[i]);
-
-    if (p_numerators[0] == 0)
+    if (p_n[0].numerator == 0)
         return 0;
 
     if (smoothing_function < 0 || smoothing_function > 1)
@@ -144,6 +141,8 @@ double corpus_bleu(int num_refs, int max_n,
     }
 
     // precise calculation???
+
+    delete[] p_n;
 
     return bp * exp(s);
 }

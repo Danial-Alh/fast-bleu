@@ -27,7 +27,6 @@ def nltk_bleu(refs, hyps):
 
 
 def cpp_bleu(refs, hyps):
-    print(BLEU)
     w = {i: list(np.ones(i) / (i)) for i in range(2, 6)}
     bleu = BLEU(refs, w, verbose=True)
     return bleu.get_score(hyps)[max_n]
@@ -77,14 +76,14 @@ tokenizer = ToktokTokenizer().tokenize
 ref_tokens = []
 test_tokens = []
 
-# with open('data/t.txt') as file:
-with open('data/coco60-test.txt') as file:
+with open('data/t.txt') as file:
+# with open('data/coco60-test.txt') as file:
     lines = file.readlines()
 for line in lines:
     ref_tokens.append(tokenizer(line))
 
-# with open('data/g.txt') as file:
-with open('data/coco60-train.txt') as file:
+with open('data/g.txt') as file:
+# with open('data/coco60-train.txt') as file:
     lines = file.readlines()
 for line in lines:
     test_tokens.append(tokenizer(line))
@@ -92,15 +91,11 @@ for line in lines:
 print('tokenized!')
 
 
-# compare(nltk_org_bleu, cpp_bleu)
-# compare(nltk_bleu, cpp_bleu)
-# compare(nltk_self_bleu, cpp_self_bleu)
+compare(nltk_org_bleu, cpp_bleu)
+compare(nltk_bleu, cpp_bleu)
+compare(nltk_self_bleu, cpp_self_bleu)
 
-res, ti = get_execution_time(cpp_bleu)
+# res, ti = get_execution_time(cpp_bleu)
 # res, ti = get_execution_time(cpp_self_bleu)
-res = np.mean(res)
-print(res, ti)
-
-# counter_test()
-
-# self_bleu_test()
+# res = np.mean(res)
+# print(res, ti)

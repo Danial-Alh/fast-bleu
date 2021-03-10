@@ -16,7 +16,7 @@ def corpus_bleu(references,
                 ref_lens,
                 weights=(0.25, 0.25, 0.25, 0.25),
                 smoothing_function=None,
-                auto_reweigh=False,
+                auto_reweight=False,
                 ):
     """
     Calculate a single corpus-level BLEU score (aka. system-level BLEU) for all
@@ -66,8 +66,8 @@ def corpus_bleu(references,
     :type weights: list(float)
     :param smoothing_function:
     :type smoothing_function: SmoothingFunction
-    :param auto_reweigh: Option to re-normalize the weights uniformly.
-    :type auto_reweigh: bool
+    :param auto_reweight: Option to re-normalize the weights uniformly.
+    :type auto_reweight: bool
     :return: The corpus-level BLEU score.
     :rtype: float
     """
@@ -96,7 +96,7 @@ def corpus_bleu(references,
 
     # Uniformly re-weighting based on maximum hypothesis lengths if largest
     # order of n-grams < 4 and weights is set at default.
-    if auto_reweigh:
+    if auto_reweight:
         if hyp_lengths < 4 and weights == (0.25, 0.25, 0.25, 0.25):
             weights = (1 / hyp_lengths,) * hyp_lengths
 
@@ -346,11 +346,11 @@ def brevity_penalty(closest_ref_len, hyp_len):
 class Bleu():  # this class speedup computation when reference is same for multisample
     # Base on https://www.nltk.org/_modules/nltk/translate/bleu_score.html
     def __init__(self, references, weights=np.ones(3) / 3., smoothing_function=SmoothingFunction().method1,
-                 auto_reweigh=False, process_num=None, other_instance=None):
+                 auto_reweight=False, process_num=None, other_instance=None):
         self.references = references
         self.weights = weights
         self.smoothing_function = smoothing_function
-        self.auto_reweigh = auto_reweigh
+        self.auto_reweight = auto_reweight
         self.max_n = len(weights)
         if process_num is None:
             self.process_num = os.cpu_count()
@@ -390,7 +390,7 @@ class Bleu():  # this class speedup computation when reference is same for multi
     def tmp_get_score(self, item):
         return corpus_bleu(self.references, item,
                            self.reference_max_counts, self.ref_lens, self.weights,
-                           self.smoothing_function, self.auto_reweigh)
+                           self.smoothing_function, self.auto_reweight)
 
     def get_reference_max_counts(self, n):
         print('calculating max counts n = %d!' % ((n + 1),))

@@ -60,7 +60,7 @@ BLEU_REVBLEU_CPP::BLEU_REVBLEU_CPP(vector<vector<string>> lines_of_tokens, vecto
     this->ref_lens = new int[lines_of_tokens.size()];
     this->weights = weights;
     this->max_n = max_n;
-    this->auto_reweigh = auto_reweigh;
+    this->auto_reweight = auto_reweight;
     this->smoothing_function = smoothing_func;
     this->number_of_refs = (int)lines_of_tokens.size();
     this->verbose = verbose;
@@ -94,7 +94,7 @@ void BLEU_REVBLEU_CPP::get_max_counts(int n)
     if (this->verbose)
         cout << n + 1 << "grams: " << ngrams_set.size() << endl;
 
-    int temp_max_counts[ngrams_set.size()];
+    int *temp_max_counts = new int[ngrams_set.size()];
     vector<string> ngrams_set_list = vector<string>(ngrams_set.cbegin(), ngrams_set.cend());
 #pragma omp parallel
     {
@@ -102,15 +102,18 @@ void BLEU_REVBLEU_CPP::get_max_counts(int n)
         for (int i = 0; i < (int)ngrams_set_list.size(); i++)
         {
             string ng = ngrams_set_list.at(i);
-            int counts[this->number_of_refs];
+            int *counts = new int[this->number_of_refs];
             for (int j = 0; j < this->number_of_refs; j++)
                 counts[j] = references_counts[n][j]->get(ng);
             int max_value = *max_element(counts, counts + number_of_refs);
             temp_max_counts[i] = max_value;
+            delete[] counts;
         }
     }
     for (int i = 0; i < (int)ngrams_set.size(); i++)
         (*reference_max_counts[n])[ngrams_set_list.at(i)] = temp_max_counts[i];
+    
+    delete[] temp_max_counts;
 }
 
 vector<vector<double>> BLEU_REVBLEU_CPP::get_score(vector<vector<string>> hypotheses)
@@ -118,7 +121,7 @@ vector<vector<double>> BLEU_REVBLEU_CPP::get_score(vector<vector<string>> hypoth
     vector<vector<double>> results;
     for (vector<float> &w : this->weights)
     {
-        double temp_results[hypotheses.size()];
+        double *temp_results = new double[hypotheses.size()];
         int curr_n = w.size();
         //        cout << "calculating bleu" << curr_n << " scores!" << endl;
 #pragma omp parallel
@@ -134,12 +137,14 @@ vector<vector<double>> BLEU_REVBLEU_CPP::get_score(vector<vector<string>> hypoth
                                               ref_lens,
                                               w,
                                               smoothing_function,
-                                              auto_reweigh);
+                                              auto_reweight);
             }
         }
         results.push_back(vector<double>());
         for (int i = 0; i < (int)hypotheses.size(); i++)
             results.back().push_back(temp_results[i]);
+        
+        delete[] temp_results;
     }
     return results;
 }

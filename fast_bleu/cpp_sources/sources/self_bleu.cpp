@@ -65,7 +65,7 @@ SELF_BLEU_CPP::SELF_BLEU_CPP(vector<vector<string>> lines_of_tokens, vector<vect
     this->ref_lens = new int[lines_of_tokens.size()];
     this->weights = weights;
     this->max_n = max_n;
-    this->auto_reweigh = auto_reweigh;
+    this->auto_reweight = auto_reweight;
     this->smoothing_function = smoothing_func;
     this->number_of_refs = (int)lines_of_tokens.size();
     this->verbose = verbose;
@@ -101,8 +101,8 @@ void SELF_BLEU_CPP::get_max_counts_old(int n)
     if (this->verbose)
         cout << n + 1 << "grams: " << ngram_keys.size() << endl;
 
-    int temp_max_counts[ngram_keys.size()];
-    int temp_max2_counts[ngram_keys.size()];
+    int *temp_max_counts = new int[ngram_keys.size()];
+    int *temp_max2_counts = new int[ngram_keys.size()];
 
 #pragma omp parallel
     {
@@ -110,7 +110,7 @@ void SELF_BLEU_CPP::get_max_counts_old(int n)
         for (int i = 0; i < (int)ngram_keys.size(); i++)
         {
             string &ng = ngram_keys[i];
-            int counts[number_of_refs];
+            int *counts = new int[number_of_refs];
             for (int j = 0; j < number_of_refs; j++)
                 counts[j] = references_counts[n][j]->get(ng);
             int *max_value_ptr = max_element(counts, counts + number_of_refs);
@@ -118,6 +118,7 @@ void SELF_BLEU_CPP::get_max_counts_old(int n)
             (*max_value_ptr) = -1;
             int max_value = *max_element(counts, counts + number_of_refs);
             temp_max2_counts[i] = max_value;
+            delete[] counts;
         }
     }
 
@@ -127,6 +128,9 @@ void SELF_BLEU_CPP::get_max_counts_old(int n)
         (*reference_max_counts[n])[ng] = temp_max_counts[i];
         (*reference_max2_counts[n])[ng] = temp_max2_counts[i];
     }
+
+    delete[] temp_max_counts;
+    delete[] temp_max2_counts;
 }
 
 void SELF_BLEU_CPP::get_max_counts(int n)
@@ -145,8 +149,8 @@ void SELF_BLEU_CPP::get_max_counts(int n)
     auto ngrams_set_list = vector<string>(ngrams_set.cbegin(), ngrams_set.cend());
     auto temp_ngram_counts = map<string, vector<int>>();
 
-    int temp_max_counts[ngrams_set.size()];
-    int temp_max2_counts[ngrams_set.size()];
+    int *temp_max_counts = new int[ngrams_set.size()];
+    int *temp_max2_counts = new int[ngrams_set.size()];
 
     for (string &ng : ngrams_set_list)
         temp_ngram_counts.insert(pair<string, vector<int>>(ng, vector<int>()));
@@ -182,6 +186,9 @@ void SELF_BLEU_CPP::get_max_counts(int n)
         (*reference_max_counts[n])[ng] = temp_max_counts[i];
         (*reference_max2_counts[n])[ng] = temp_max2_counts[i];
     }
+
+    delete[] temp_max_counts;
+    delete[] temp_max2_counts;
 }
 
 vector<vector<double>> SELF_BLEU_CPP::get_score()
@@ -189,14 +196,13 @@ vector<vector<double>> SELF_BLEU_CPP::get_score()
     vector<vector<double>> results;
     for (vector<float> &w : this->weights)
     {
-        double temp_results[number_of_refs];
         int curr_n = w.size();
-
+        CustomMap **ref_max_counts = new CustomMap*[curr_n];
+        vector<string> **refs = new vector<string>*[number_of_refs - 1];
+        int *lens = new int[number_of_refs - 1];
+        double *temp_results = new double[number_of_refs];
         //        cout << "calculating self_bleu" << curr_n << " scores!" << endl;
 
-        vector<string> *refs[number_of_refs - 1];
-        int lens[number_of_refs - 1];
-        CustomMap *ref_max_counts[curr_n];
         for (int n = 0; n < curr_n; n++)
             ref_max_counts[n] = new CustomMap(*(reference_max_counts[n]));
 
@@ -235,7 +241,7 @@ vector<vector<double>> SELF_BLEU_CPP::get_score()
                                           lens,
                                           w,
                                           smoothing_function,
-                                          auto_reweigh);
+                                          auto_reweight);
             for (int n = 0; n < curr_n; n++)
                 for (pair<string, int> const &p : *(references_counts[n][i]))
                 {
@@ -249,6 +255,12 @@ vector<vector<double>> SELF_BLEU_CPP::get_score()
         results.push_back(vector<double>());
         for (int i = 0; i < number_of_refs; i++)
             results.back().push_back(temp_results[i]);
+
+        delete[] temp_results;
+        delete[] lens;
+        delete[] refs;
+        delete[] ref_max_counts;
     }
+
     return results;
 }

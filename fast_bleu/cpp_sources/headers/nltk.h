@@ -24,6 +24,6 @@ double corpus_bleu(int num_refs, int max_n,
                    int* ref_lens,
                    vector<float> weights,
                    int smoothing_function,
-                   bool auto_reweigh);
+                   bool auto_reweight);
 
 #endif
