@@ -43,7 +43,7 @@ def nltk_self_bleu(refs, hyps):
 
 
 def cpp_self_bleu(refs, hyps):
-    from fast_bleu.__python_wrapper import SelfBLEU
+    from fast_bleu.__python_wrapper__ import SelfBLEU
     w = {i: list(np.ones(i) / (i)) for i in range(2, 6)}
     bleu = SelfBLEU(refs, w, verbose=True)
     res = bleu.get_score()
