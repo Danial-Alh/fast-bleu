@@ -5,6 +5,9 @@ It can return (Self)BLEU for different (max) n-grams simultaneously and efficien
 
 ## Installation
 
+The installation requires `c++17`.
+The `requirements.txt` file is the required python packages to run the `test_cases.py` file.
+
 ### Linux and WSL
 
 Installing [PyPI latest stable release](https://pypi.org/project/fast-bleu/):

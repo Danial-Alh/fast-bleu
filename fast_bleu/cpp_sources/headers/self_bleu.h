@@ -24,7 +24,7 @@ private:
   CustomMap **reference_max2_counts;
   vector<vector<float>> weights;
   int smoothing_function;
-  bool auto_reweigh;
+  bool auto_reweight;
   int max_n;
   int *ref_lens;
   int number_of_refs;

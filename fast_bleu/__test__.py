@@ -25,3 +25,5 @@ def test():
 
     self_bleu = SelfBLEU(list_of_references, weights)
     print(self_bleu.get_score())
+
+test()

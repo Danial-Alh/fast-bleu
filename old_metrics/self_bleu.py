@@ -12,11 +12,11 @@ from .utils import get_ngrams, Threader
 class SelfBleu():  # this class speedup computation when reference is same for multisample
     # Base on https://www.nltk.org/_modules/nltk/translate/bleu_score.html
     def __init__(self, references, weights=np.ones(3) / 3., smoothing_function=SmoothingFunction().method1,
-                 auto_reweigh=False, process_num=None, other_instance=None, verbose=True):
+                 auto_reweight=False, process_num=None, other_instance=None, verbose=True):
         self.references = references
         self.weights = weights
         self.smoothing_function = smoothing_function
-        self.auto_reweigh = auto_reweigh
+        self.auto_reweight = auto_reweight
         self.max_n = len(weights)
         self.verbose = verbose
         if process_num is None:
@@ -68,7 +68,7 @@ class SelfBleu():  # this class speedup computation when reference is same for m
                     ref_max_counts[n][ng] = self.reference_max2_counts[n][ng]
         result = corpus_bleu(refs, item,
                              ref_max_counts, ref_lens, self.weights,
-                             self.smoothing_function, self.auto_reweigh)
+                             self.smoothing_function, self.auto_reweight)
         for n in range(self.max_n):
             for ng in item_counts[n]:
                 ref_max_counts[n][ng] = self.reference_max_counts[n][ng]
