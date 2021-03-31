@@ -70,7 +70,7 @@ with open("README.md", "r") as fh:
 
 setup = setuptools.setup(
     name='fast-bleu',
-    version="0.0.88",
+    version="0.0.89",
     author="Danial Alihosseini",
     author_email="danial.alihosseini@gmail.com",
     description="A fast multithreaded C++ implementation of nltk BLEU with python wrapper.",
