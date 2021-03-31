@@ -70,7 +70,7 @@ with open("README.md", "r") as fh:
 
 setup = setuptools.setup(
     name='fast-bleu',
-    version="0.0.87",
+    version="0.0.88",
     author="Danial Alihosseini",
     author_email="danial.alihosseini@gmail.com",
     description="A fast multithreaded C++ implementation of nltk BLEU with python wrapper.",
@@ -81,8 +81,8 @@ setup = setuptools.setup(
         Extension(
             name="fast_bleu.__fast_bleu_module",
             sources=glob('fast_bleu/cpp_sources/sources/*.cpp'),
-            extra_compile_args=['-fopenmp', '-std=c++17', '-Werror', '-pedantic-errors', '-Wall', '-Wextra'],
-            extra_link_args=['-fopenmp', '-std=c++17', '-Werror', '-pedantic-errors', '-Wall', '-Wextra'],
+            extra_compile_args=['-fopenmp', '-std=c++11', '-Werror', '-pedantic-errors', '-Wall', '-Wextra'],
+            extra_link_args=['-fopenmp', '-std=c++11', '-Werror', '-pedantic-errors', '-Wall', '-Wextra'],
             include_dirs=['fast_bleu/cpp_sources/headers/'],
         ), ],
     cmdclass={

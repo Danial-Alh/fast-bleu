@@ -93,7 +93,7 @@ double brevity_penalty(int closest_ref_len, int hyp_len)
 }
 
 double corpus_bleu(int num_refs, int max_n,
-                   [[maybe_unused]] vector<string> **references,
+                   __attribute__((unused)) vector<string> **references,
                    vector<string> *hypothesis,
                    CustomMap **reference_max_counts,
                    int *ref_lens,
