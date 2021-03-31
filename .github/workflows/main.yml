@@ -14,7 +14,7 @@ jobs:
 
       - name: Publish a Python distribution to PyPI
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-        uses: pypa/gh-action-pypi-publish@release/v1
+        uses: pypa/gh-action-pypi-publish@release/v1.4.2
         with:
           user: ${{ secrets.PYPI_USER }}
           password: ${{ secrets.PYPI_SECRET }}
