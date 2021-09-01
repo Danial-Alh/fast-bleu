@@ -10,7 +10,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Run testcase
-        run: python testcase.py
+        run: python testcases.py
 
       - name: Setup package
         run: python setup.py sdist
