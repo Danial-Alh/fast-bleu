@@ -127,7 +127,7 @@ class BLEU:
         return {self.__weight_keys[i]: r for i, r in enumerate(result)}
 
     def __del__(self):
-        if hasattr(self, '__instance') and hasattr(self, '__del_instance'):
+        if hasattr(self, '_BLEU__instance') and hasattr(self, '_BLEU__del_instance'):
             self.__del_instance(self.__instance)
 
 
@@ -240,5 +240,5 @@ class SelfBLEU:
         return {self.__weight_keys[i]: r for i, r in enumerate(result)}
 
     def __del__(self):
-        if hasattr(self, '__instance') and hasattr(self, '__del_instance'):
+        if hasattr(self, '_SelfBLEU__instance') and hasattr(self, '_SelfBLEU__del_instance'):
             self.__del_instance(self.__instance)
