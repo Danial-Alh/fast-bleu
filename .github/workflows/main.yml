@@ -12,7 +12,7 @@ jobs:
       - name: Run testcase
         run: python testcase.py
 
-      - name: Build package
+      - name: Setup package
         run: python setup.py sdist
 
       - name: Publish a Python distribution to PyPI
