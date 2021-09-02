@@ -1,7 +1,7 @@
 # fast-bleu Package
 
-This is a fast multithreaded C++ implementation of NLTK BLEU with Python wrapper; computing BLEU and SelfBLEU score for a fixed reference set.
-It can return (Self)BLEU for different (max) n-grams simultaneously and efficiently (e.g. BLEU-2, BLEU-3 and etc.).
+This is a fast multithreaded C++ implementation of NLTK BLEU with Python wrapper; computing BLEU and SelfBLEU scores for a fixed reference set.
+It can return (Self)BLEU for different (max) n-grams simultaneously and efficiently (e.g. BLEU-2, BLEU-3, etc.).
 
 ## Installation
 
@@ -18,10 +18,10 @@ pip install --user fast-bleu
 
 ### MacOS
 
-As the macOS uses clang and it does not support OpenMP; one workaround is to first install gcc with `brew install gcc`. After that, gcc specific binaries will be added (for example, it will be maybe `gcc-10`
+As the macOS uses clang and it does not support OpenMP, one workaround is to first install gcc with `brew install gcc`. After that, gcc specific binaries will be added (for example, it will be maybe `gcc-10`
 and `g++-10`).
 
-To change the default compiler, an option to the installation command is added. So you can install the [PyPI latest stable release](https://pypi.org/project/fast-bleu/) with the following command:
+To change the default compiler, an option to the installation command is added, so you can install the [PyPI latest stable release](https://pypi.org/project/fast-bleu/) with the following command:
 
 ``` bash
 pip install --user fast-bleu --install-option="--CC=<path-to-gcc>" --install-option="--CXX=<path-to-g++>"
