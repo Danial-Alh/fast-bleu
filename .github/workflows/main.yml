@@ -9,7 +9,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Build package
+      - name: Install packages
+        run: pip install -r requirements.txt
+
+      - name: Run test case
+        run: python test_cases.py
+
+      - name: Setup package
         run: python setup.py sdist
 
       - name: Publish a Python distribution to PyPI

@@ -1,3 +1,4 @@
+#include <limits>
 #include <vector>
 #include <string>
 #include <cmath>
@@ -60,11 +61,11 @@ Fraction modified_precision(CustomMap **reference_max_counts,
     int numerator = 0;
     int denominator = 0;
 
-    for (pair<string, int> const &p : counts)
+    for (auto const &p : counts)
         denominator += counts.get(p.first);
     denominator = max(1, denominator);
 
-    for (pair<string, int> const &p : counts)
+    for (auto const &p : counts)
         numerator += min(counts.get(p.first), max_counts.get(p.first));
 
     delete hyp_ngrams;

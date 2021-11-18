@@ -29,7 +29,9 @@ def nltk_bleu(refs, hyps):
 def cpp_bleu(refs, hyps):
     w = {i: list(np.ones(i) / (i)) for i in range(2, 6)}
     bleu = BLEU(refs, w, verbose=True)
-    return bleu.get_score(hyps)[max_n]
+    score = bleu.get_score(hyps)[max_n]
+    del bleu
+    return score
 
 
 def nltk_self_bleu(refs, hyps):
@@ -93,7 +95,7 @@ print('tokenized!')
 
 compare(nltk_org_bleu, cpp_bleu)
 # compare(nltk_bleu, cpp_bleu)
-# compare(nltk_self_bleu, cpp_self_bleu)
+compare(nltk_self_bleu, cpp_self_bleu)
 
 # res, ti = get_execution_time(cpp_bleu)
 # res, ti = get_execution_time(cpp_self_bleu)

@@ -227,7 +227,7 @@ vector<vector<double>> SELF_BLEU_CPP::get_score()
                 refs[s + t] = references[s];
             }
             for (int n = 0; n < curr_n; n++)
-                for (pair<string, int> const &p : *(references_counts[n][i]))
+                for (auto const &p : *(references_counts[n][i]))
                 {
                     string const &ng = p.first;
                     if (reference_max_counts[n]->get(ng) == references_counts[n][i]->get(ng))
@@ -243,7 +243,7 @@ vector<vector<double>> SELF_BLEU_CPP::get_score()
                                           smoothing_function,
                                           auto_reweight);
             for (int n = 0; n < curr_n; n++)
-                for (pair<string, int> const &p : *(references_counts[n][i]))
+                for (auto const &p : *(references_counts[n][i]))
                 {
                     string const &ng = p.first;
                     (*ref_max_counts[n])[ng] = reference_max_counts[n]->get(ng);
